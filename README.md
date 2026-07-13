@@ -34,12 +34,16 @@ OPENAI_API_KEY=your-key bash scripts/docker_peakDigital
 ## Useful controls
 
 ```bash
+scripts/docker_peakDigital start
+scripts/docker_peakDigital stop
+scripts/docker_peakDigital restart
 scripts/docker_peakDigital status
 scripts/docker_peakDigital logs
 scripts/docker_peakDigital test
-scripts/docker_peakDigital down
 scripts/docker_peakDigital reset
 ```
+
+`stop` closes the application containers while preserving the local database. `start` reopens the existing application, and `restart` performs both operations in sequence.
 
 `reset` deletes the local demo database volume and rebuilds the curated dataset.
 

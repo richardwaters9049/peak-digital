@@ -350,12 +350,17 @@ banner
 show_platform
 
 case "$ACTION" in
-  up)
+  up | start)
     run_up
     ;;
-  down)
+  down | stop)
     create_env
     compose down
+    ;;
+  restart)
+    create_env
+    compose down
+    run_up
     ;;
   status)
     create_env
@@ -389,7 +394,7 @@ case "$ACTION" in
     run_up
     ;;
   *)
-    printf 'Usage: bash scripts/docker_peakDigital [up|down|status|logs|test|reset]\n' >&2
+    printf 'Usage: scripts/docker_peakDigital [start|stop|restart|status|logs|test|reset]\n' >&2
     exit 2
     ;;
 esac
