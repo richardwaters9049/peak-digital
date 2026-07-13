@@ -41,7 +41,7 @@ For a production evolution, model calls would move onto queues, webhook requests
 
 ## Demo-safe tradeoffs
 
-- Authentication is a clearly labelled local session simulation; production would use Laravel Sanctum/OIDC with server-side authorization.
+- Authentication is a clearly labelled local session simulation; production would use Laravel Sanctum/OIDC with server-side authorisation.
 - Automation runs are synchronous so the complete flow is visible in the demo; production calls would be queued and retried.
 - The seed dataset is fictional and idempotent.
 - The Compose secrets are generated locally into ignored `.env` files and are not production credentials.
