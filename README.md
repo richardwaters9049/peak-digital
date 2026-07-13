@@ -7,7 +7,7 @@ This workspace contains **Peak Reviews AI Ops**, a full-stack AI operations cons
 From this directory, run:
 
 ```bash
-bash scripts/docker_peakDigital
+scripts/docker_peakDigital
 ```
 
 The launcher selects free local ports, generates development-only secrets, builds the Laravel API and Next.js dashboard, starts PostgreSQL, runs migrations and idempotent demo seeding, waits for health checks, and opens the app in your browser where the platform supports it.
@@ -34,11 +34,11 @@ OPENAI_API_KEY=your-key bash scripts/docker_peakDigital
 ## Useful controls
 
 ```bash
-bash scripts/docker_peakDigital status
-bash scripts/docker_peakDigital logs
-bash scripts/docker_peakDigital test
-bash scripts/docker_peakDigital down
-bash scripts/docker_peakDigital reset
+scripts/docker_peakDigital status
+scripts/docker_peakDigital logs
+scripts/docker_peakDigital test
+scripts/docker_peakDigital down
+scripts/docker_peakDigital reset
 ```
 
 `reset` deletes the local demo database volume and rebuilds the curated dataset.
