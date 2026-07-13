@@ -1,0 +1,76 @@
+name: peak-reviews-ai-ops
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-peak_reviews}
+      POSTGRES_USER: ${POSTGRES_USER:-peak}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-peak} -d ${POSTGRES_DB:-peak_reviews}"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./api
+    environment:
+      APP_NAME: "Peak Reviews AI Ops API"
+      APP_ENV: local
+      APP_KEY: ${APP_KEY}
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:${API_PORT:-8000}
+      LOG_CHANNEL: stderr
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB:-peak_reviews}
+      DB_USERNAME: ${POSTGRES_USER:-peak}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CACHE_STORE: database
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: sync
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_TIMEOUT: 20
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/api/dashboard/summary') === false ? 1 : 0);"]
+      interval: 5s
+      timeout: 4s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./web
+    environment:
+      API_URL: http://api:8000
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
+      interval: 5s
+      timeout: 4s
+      retries: 30
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

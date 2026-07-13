@@ -1,0 +1,201 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_DIR="${ROOT_DIR}/projects/peak-reviews-ai-ops"
+ENV_FILE="${PROJECT_DIR}/.env"
+ACTION="${1:-up}"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+banner() {
+  printf "${PURPLE}"
+  printf '%s\n' '╔════════════════════════════════════════════════════════╗'
+  printf '%s\n' '║  PEAK REVIEWS AI OPS                                  ║'
+  printf '%s\n' '║  Laravel + Next.js + PostgreSQL + AI automation       ║'
+  printf '%s\n' '╚════════════════════════════════════════════════════════╝'
+  printf "${NC}"
+}
+
+die() {
+  printf "${RED}Error:${NC} %s\n" "$1" >&2
+  exit 1
+}
+
+compose() {
+  docker compose --project-directory "$PROJECT_DIR" --env-file "$ENV_FILE" "$@"
+}
+
+port_available() {
+  python3 - "$1" <<'PY'
+import socket
+import sys
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    try:
+        sock.bind(("127.0.0.1", int(sys.argv[1])))
+    except OSError:
+        raise SystemExit(1)
+PY
+}
+
+choose_port() {
+  local port="$1"
+  while ! port_available "$port"; do
+    port=$((port + 1))
+  done
+  printf '%s' "$port"
+}
+
+random_hex() {
+  openssl rand -hex "${1:-24}"
+}
+
+create_env() {
+  [ -f "$ENV_FILE" ] && return 0
+
+  command -v python3 >/dev/null 2>&1 || die 'python3 is required for automatic port selection.'
+  command -v openssl >/dev/null 2>&1 || die 'openssl is required to create local demo secrets.'
+
+  local web_port api_port postgres_port app_key postgres_password
+  web_port="$(choose_port 3000)"
+  api_port="$(choose_port 8000)"
+  postgres_port="$(choose_port 5433)"
+  app_key="$(openssl rand -base64 32 | tr -d '\n')"
+  postgres_password="$(random_hex 18)"
+
+  umask 077
+  {
+    printf 'WEB_PORT=%s\n' "$web_port"
+    printf 'API_PORT=%s\n' "$api_port"
+    printf 'POSTGRES_PORT=%s\n' "$postgres_port"
+    printf 'POSTGRES_DB=peak_reviews\n'
+    printf 'POSTGRES_USER=peak\n'
+    printf 'POSTGRES_PASSWORD=%s\n' "$postgres_password"
+    printf 'APP_KEY=base64:%s\n' "$app_key"
+    printf 'OPENAI_API_KEY=%s\n' "${OPENAI_API_KEY:-}"
+    printf 'OPENAI_MODEL=%s\n' "${OPENAI_MODEL:-gpt-4o-mini}"
+  } >"$ENV_FILE"
+
+  printf "${GREEN}Created${NC} local configuration with free ports and generated secrets.\n"
+}
+
+env_value() {
+  sed -n "s/^$1=//p" "$ENV_FILE" | tail -n 1
+}
+
+wait_for_url() {
+  local name="$1"
+  local url="$2"
+  local attempts=90
+  local count=1
+
+  printf "${CYAN}Waiting${NC} for %s" "$name"
+  while [ "$count" -le "$attempts" ]; do
+    if curl --silent --fail --max-time 3 "$url" >/dev/null 2>&1; then
+      printf " ${GREEN}ready${NC}\n"
+      return 0
+    fi
+    printf '.'
+    sleep 2
+    count=$((count + 1))
+  done
+
+  printf " ${RED}failed${NC}\n"
+  compose ps
+  compose logs --tail=80 api frontend
+  die "$name did not become ready at $url"
+}
+
+show_urls() {
+  local web_port api_port
+  web_port="$(env_value WEB_PORT)"
+  api_port="$(env_value API_PORT)"
+  printf "\n${GREEN}Peak Reviews AI Ops is ready.${NC}\n"
+  printf '  Dashboard:  %s\n' "http://localhost:${web_port}"
+  printf '  Laravel API: %s\n' "http://localhost:${api_port}/api/dashboard/summary"
+  printf '  Health:      %s\n' "http://localhost:${api_port}/up"
+  printf '\n%s\n' 'The demo works without an OpenAI key using its audited deterministic fallback.'
+}
+
+ensure_requirements() {
+  command -v docker >/dev/null 2>&1 || die 'Docker is not installed.'
+  docker info >/dev/null 2>&1 || die 'Docker is not running. Start Docker Desktop and rerun the command.'
+  docker compose version >/dev/null 2>&1 || die 'Docker Compose is unavailable.'
+  command -v curl >/dev/null 2>&1 || die 'curl is required for readiness checks.'
+}
+
+run_up() {
+  ensure_requirements
+  create_env
+  local web_port api_port
+  web_port="$(env_value WEB_PORT)"
+  api_port="$(env_value API_PORT)"
+
+  printf "${CYAN}Building and starting${NC} the complete application...\n"
+  if ! compose up --build --detach --remove-orphans; then
+    printf "${RED}Startup failed.${NC} Recent service logs:\n" >&2
+    compose ps --all || true
+    compose logs --tail=100 postgres api frontend || true
+    exit 1
+  fi
+  wait_for_url 'Laravel API' "http://localhost:${api_port}/api/dashboard/summary"
+  wait_for_url 'Next.js dashboard' "http://localhost:${web_port}"
+  show_urls
+
+  if [ "${OPEN_BROWSER:-1}" = '1' ] && [ "$(uname -s)" = 'Darwin' ]; then
+    open "http://localhost:${web_port}" >/dev/null 2>&1 || true
+  fi
+}
+
+banner
+
+case "$ACTION" in
+  up)
+    run_up
+    ;;
+  down)
+    create_env
+    compose down
+    ;;
+  status)
+    create_env
+    compose ps
+    printf '  Dashboard:   http://localhost:%s\n' "$(env_value WEB_PORT)"
+    printf '  Laravel API: http://localhost:%s/api/dashboard/summary\n' "$(env_value API_PORT)"
+    ;;
+  logs)
+    create_env
+    compose logs --follow --tail=120
+    ;;
+  test)
+    ensure_requirements
+    create_env
+    compose up --build --detach postgres api frontend
+    compose run --rm --no-deps \
+      -e APP_ENV=testing \
+      -e DB_CONNECTION=sqlite \
+      -e DB_DATABASE=:memory: \
+      -e CACHE_STORE=array \
+      -e SESSION_DRIVER=array \
+      -e QUEUE_CONNECTION=sync \
+      api sh -lc 'cp .env.example .env && php artisan test'
+    compose run --rm --no-deps frontend bun run lint
+    ;;
+  reset)
+    ensure_requirements
+    create_env
+    printf "${YELLOW}Resetting${NC} containers and the local PostgreSQL volume...\n"
+    compose down --volumes --remove-orphans
+    run_up
+    ;;
+  *)
+    printf 'Usage: bash scripts/docker_peakDigital [up|down|status|logs|test|reset]\n' >&2
+    exit 2
+    ;;
+esac
