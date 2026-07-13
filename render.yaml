@@ -2,45 +2,84 @@ services:
   - type: web
     name: peak-reviews-ai-ops-api
     runtime: docker
-    rootDir: api
+    rootDir: projects/peak-reviews-ai-ops/api
     plan: free
-    autoDeploy: true
+    region: frankfurt
+    autoDeployTrigger: checksPass
+    healthCheckPath: /up
+
     envVars:
       - key: APP_NAME
         value: Peak Reviews AI Ops API
+
       - key: APP_ENV
         value: production
+
       - key: APP_DEBUG
-        value: false
+        value: "false"
+
+      - key: APP_URL
+        value: https://peak-reviews-ai-ops-api.onrender.com
+
       - key: APP_KEY
-        generateValue: true
+        sync: false
+
       - key: DB_CONNECTION
         value: pgsql
+
       - key: DB_HOST
         fromDatabase:
           name: peak-reviews-ai-ops-db
           property: host
+
       - key: DB_PORT
         fromDatabase:
           name: peak-reviews-ai-ops-db
           property: port
+
       - key: DB_DATABASE
         fromDatabase:
           name: peak-reviews-ai-ops-db
           property: database
+
       - key: DB_USERNAME
         fromDatabase:
           name: peak-reviews-ai-ops-db
           property: user
+
       - key: DB_PASSWORD
         fromDatabase:
           name: peak-reviews-ai-ops-db
           property: password
+
+      - key: CACHE_STORE
+        value: database
+
+      - key: SESSION_DRIVER
+        value: database
+
       - key: QUEUE_CONNECTION
         value: sync
+
       - key: OPENAI_MODEL
         value: gpt-4o-mini
+
+  - type: web
+    name: peak-reviews-ai-ops-web
+    runtime: docker
+    rootDir: projects/peak-reviews-ai-ops/web
+    plan: free
+    region: frankfurt
+    autoDeployTrigger: checksPass
+    healthCheckPath: /
+
+    envVars:
+      - key: API_URL
+        value: https://peak-reviews-ai-ops-api.onrender.com
 
 databases:
   - name: peak-reviews-ai-ops-db
     plan: free
+    region: frankfurt
+    databaseName: peak_reviews
+    user: peak
