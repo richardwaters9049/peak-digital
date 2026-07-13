@@ -9,7 +9,7 @@ return [
     | Default Session Driver
     |--------------------------------------------------------------------------
     |
-    | This option determines the default session driver that is utilized for
+    | This option determines the default session driver that is used for
     | incoming requests. Laravel supports a variety of storage options to
     | persist session data. Database storage is a great default choice.
     |
@@ -54,7 +54,7 @@ return [
     | Session File Location
     |--------------------------------------------------------------------------
     |
-    | When utilizing the "file" session driver, the session files are placed
+    | When using the "file" session driver, the session files are placed
     | on disk. The default storage location is defined here; however, you
     | are free to provide another location where they should be stored.
     |
@@ -216,13 +216,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Session Serialization
+    | Session Serialisation
     |--------------------------------------------------------------------------
     |
-    | This value controls the serialization strategy for session data, which
+    | This value controls the serialisation strategy for session data, which
     | is JSON by default. Setting this to "php" allows the storage of PHP
     | objects in the session but can make an application vulnerable to
-    | "gadget chain" serialization attacks if the APP_KEY is leaked.
+    | "gadget chain" serialisation attacks if the APP_KEY is leaked.
     |
     | Supported: "json", "php"
     |

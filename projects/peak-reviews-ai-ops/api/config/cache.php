@@ -10,7 +10,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default cache store that will be used by the
-    | framework. This connection is utilized if another isn't explicitly
+    | framework. This connection is used if another isn't explicitly
     | specified when running a cache operation inside the application.
     |
     */
@@ -112,7 +112,7 @@ return [
     | Cache Key Prefix
     |--------------------------------------------------------------------------
     |
-    | When utilizing the APC, database, memcached, Redis, and DynamoDB cache
+    | When using the APC, database, memcached, Redis, and DynamoDB cache
     | stores, there might be other applications using the same cache. For
     | that reason, you may prefix every cache key to avoid collisions.
     |
@@ -122,11 +122,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Serializable Classes
+    | Serialisable Classes
     |--------------------------------------------------------------------------
     |
-    | This value determines the classes that can be unserialized from cache
-    | storage. By default, no PHP classes will be unserialized from your
+    | This value determines the classes that can be unserialised from cache
+    | storage. By default, no PHP classes will be unserialised from your
     | cache to prevent gadget chain attacks if your APP_KEY is leaked.
     |
     */
