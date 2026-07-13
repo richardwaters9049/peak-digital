@@ -6,6 +6,7 @@ import {
   BarChart3,
   Bot,
   CheckCircle2,
+  ChevronRight,
   CircleDot,
   ClipboardList,
   Code2,
@@ -484,7 +485,7 @@ export default function Home() {
 
   return (
     <main style={themeVars[theme]} className="min-h-screen overflow-x-hidden bg-[var(--app-bg)] text-[var(--text)]">
-      <AppHeader
+      <AppSidebar
         activeTab={activeTab}
         isDark={isDark}
         onLogout={() => setSession(null)}
@@ -494,14 +495,14 @@ export default function Home() {
         theme={theme}
       />
 
-      <section className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
-        <header className="mb-6 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,430px)]">
+      <section className="mx-auto min-h-screen w-full max-w-[1680px] pl-[84px] pr-4 py-5 sm:pl-24 sm:pr-6 lg:py-6 lg:pr-8">
+        <header className="mb-5 grid min-w-0 items-stretch gap-5 xl:grid-cols-2">
           <div className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_70px_var(--shadow)] sm:p-7">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--accent-soft)] px-3 py-2 text-sm font-semibold text-[var(--accent)]">
               <Sparkles size={16} />
               AI-native review operations
             </div>
-            <h1 className="max-w-4xl break-words text-3xl font-semibold leading-tight tracking-normal sm:text-5xl">
+            <h1 className="max-w-4xl break-words text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
               Turn reputation signals into recoverable customer moments.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
@@ -511,7 +512,7 @@ export default function Home() {
           <div className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_70px_var(--shadow)]">
             <p className="text-sm font-semibold text-[var(--muted)]">Demo control</p>
             <p className="mt-2 text-sm leading-6 text-[var(--faint)]">{notice}</p>
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 onClick={refreshData}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-2)] px-3 text-sm font-semibold text-[var(--text)]"
@@ -599,7 +600,7 @@ function LoginScreen({
               <ShieldCheck size={16} />
               Laravel, OpenAI, queues, webhooks
             </div>
-            <h1 className="max-w-4xl break-words text-4xl font-semibold leading-[1.02] tracking-normal text-[var(--text)] sm:text-5xl xl:text-6xl">
+            <h1 className="max-w-4xl break-words text-3xl font-semibold leading-tight tracking-normal text-[var(--text)] sm:text-4xl xl:text-5xl">
               Make every public review feel recoverable.
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-7 text-[var(--muted)] sm:text-lg sm:leading-8">
@@ -617,7 +618,7 @@ function LoginScreen({
         <div className="min-w-0 w-full rounded-[18px] border border-[var(--line)] bg-[var(--surface-2)] p-5 shadow-[0_24px_70px_var(--shadow)] sm:p-7">
           <div className="mb-7">
             <p className="text-sm font-semibold text-[var(--accent)]">Secure demo access</p>
-            <h2 className="mt-2 text-3xl font-semibold leading-tight">Enter the operations desk</h2>
+            <h2 className="mt-2 text-2xl font-semibold leading-tight">Enter the operations desk</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
               Choose a seeded identity and jump straight into the product dashboard.
             </p>
@@ -789,7 +790,7 @@ function ReviewRadar() {
   );
 }
 
-function AppHeader({
+function AppSidebar({
   activeTab,
   isDark,
   onLogout,
@@ -807,50 +808,80 @@ function AppHeader({
   theme: ThemeMode;
 }) {
   return (
-    <header className="sticky top-0 z-20 overflow-x-hidden border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-[1600px] min-w-0 flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-4">
-          <BrandMark compact />
-          <div className="hidden h-9 w-px bg-[var(--line)] sm:block" />
-          <div>
-            <p className="text-sm font-semibold">{session.name}</p>
-            <p className="break-all text-xs text-[var(--muted)]">{session.email}</p>
+    <aside
+      aria-label="Primary navigation"
+      className="group fixed inset-y-0 left-0 z-30 w-[68px] transition-[width] duration-300 ease-out hover:w-[260px] focus-within:w-[260px] sm:w-20 sm:hover:w-[280px] sm:focus-within:w-[280px]"
+    >
+      <div className="relative flex h-full flex-col overflow-visible border-r border-[var(--line)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] px-3 py-4 shadow-[12px_0_40px_var(--shadow)] backdrop-blur sm:px-4 sm:py-5">
+        <div className="flex h-12 min-w-0 items-center gap-3 overflow-hidden">
+          <div className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-[var(--accent)] text-white shadow-[0_18px_50px_var(--shadow)]">
+            <Sparkles size={21} />
           </div>
-          <Badge value={session.role} />
+          <div className="min-w-[160px] translate-x-2 opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100">
+            <p className="text-sm font-semibold">Peak Reviews</p>
+            <p className="text-xs text-[var(--muted)]">AI Ops Console</p>
+          </div>
         </div>
 
-        <nav className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+        <div aria-hidden="true" className="absolute -right-3 top-24 grid size-7 place-items-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--accent)] shadow-[0_10px_28px_var(--shadow)]">
+          <ChevronRight className="transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" size={15} />
+        </div>
+
+        <nav className="mt-8 grid min-w-0 gap-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`inline-flex h-10 items-center justify-center gap-2 rounded-full border px-3 text-sm font-semibold transition ${
+                title={item.label}
+                aria-current={activeTab === item.id ? "page" : undefined}
+                className={`flex h-12 min-w-0 items-center gap-3 overflow-hidden rounded-[16px] border px-3 text-sm font-semibold transition ${
                   activeTab === item.id
                     ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
                     : "border-transparent text-[var(--muted)] hover:border-[var(--line)] hover:bg-[var(--surface-2)]"
                 }`}
               >
-                <Icon size={16} />
-                {item.label}
+                <Icon className="shrink-0" size={19} />
+                <span className="min-w-[170px] translate-x-2 text-left opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100">
+                  {item.label}
+                </span>
               </button>
             );
           })}
         </nav>
 
-        <div className="grid grid-cols-2 gap-2 sm:flex">
-          <ThemeToggle isDark={isDark} setTheme={setTheme} theme={theme} />
+        <div className="mt-auto grid gap-2 border-t border-[var(--line)] pt-4">
+          <div className="mb-2 flex min-w-0 items-center gap-3 overflow-hidden px-2">
+            <div className="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--accent-soft)] text-xs font-bold text-[var(--accent)]">
+              {session.name.split(" ").map((part) => part[0]).join("")}
+            </div>
+            <div className="min-w-[175px] translate-x-2 opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100">
+              <p className="truncate text-sm font-semibold">{session.name}</p>
+              <p className="truncate text-xs text-[var(--muted)]">{session.role}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            title={isDark ? "Use light mode" : "Use dark mode"}
+            className="flex h-11 min-w-0 items-center gap-3 overflow-hidden rounded-[14px] border border-[var(--line)] bg-[var(--surface-2)] px-3 text-sm font-semibold text-[var(--text)]"
+          >
+            {isDark ? <Sun className="shrink-0" size={18} /> : <Moon className="shrink-0" size={18} />}
+            <span className="min-w-[170px] text-left opacity-0 transition duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+              {isDark ? "Light mode" : "Dark mode"}
+            </span>
+          </button>
           <button
             onClick={onLogout}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-2)] px-3 text-sm font-semibold text-[var(--muted)]"
+            title="Log out"
+            className="flex h-11 min-w-0 items-center gap-3 overflow-hidden rounded-[14px] border border-transparent px-3 text-sm font-semibold text-[var(--muted)] transition hover:border-[var(--line)] hover:bg-[var(--surface-2)]"
           >
-            <LogOut size={16} />
-            Logout
+            <LogOut className="shrink-0" size={18} />
+            <span className="min-w-[170px] text-left opacity-0 transition duration-200 group-hover:opacity-100 group-focus-within:opacity-100">Log out</span>
           </button>
         </div>
       </div>
-    </header>
+    </aside>
   );
 }
 
@@ -859,14 +890,14 @@ function Dashboard({ summary }: { summary: DashboardSummary }) {
 
   return (
     <div className="min-w-0 space-y-6">
-      <section className="grid min-w-0 gap-5 xl:grid-cols-[260px_minmax(0,1fr)_minmax(280px,420px)]">
+      <section className="grid min-w-0 items-stretch gap-5 xl:grid-cols-3">
         <RecoveryQueue summary={summary} />
         <Panel>
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--accent-soft)] px-3 py-2 text-sm font-semibold text-[var(--accent)]">
             <Layers3 size={16} />
             Client command layer
           </div>
-          <h2 className="max-w-4xl break-words text-3xl font-semibold leading-tight tracking-normal sm:text-5xl">
+          <h2 className="max-w-4xl break-words text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
             Every review gets a route, not just a reply.
           </h2>
           <p className="mt-5 max-w-3xl text-base leading-7 text-[var(--muted)]">
@@ -882,7 +913,7 @@ function Dashboard({ summary }: { summary: DashboardSummary }) {
           <div className="mb-5 flex items-start justify-between">
             <div>
               <p className="text-sm font-semibold text-[var(--muted)]">AI coverage</p>
-              <p className="mt-2 text-5xl font-semibold">{summary.metrics.ai_coverage}%</p>
+              <p className="mt-2 text-4xl font-semibold">{summary.metrics.ai_coverage}%</p>
             </div>
             <Bot className="text-[var(--accent)]" size={28} />
           </div>
@@ -900,7 +931,7 @@ function Dashboard({ summary }: { summary: DashboardSummary }) {
         </Panel>
       </section>
 
-      <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+      <div className="grid min-w-0 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <MetricCard label="Reviews" value={summary.metrics.review_volume} icon={Inbox} />
         <MetricCard label="Avg rating" value={summary.metrics.average_rating} icon={Star} />
         <MetricCard label="Negative alerts" value={summary.metrics.negative_alerts} icon={AlertTriangle} danger />
@@ -908,7 +939,7 @@ function Dashboard({ summary }: { summary: DashboardSummary }) {
         <MetricCard label="AI coverage" value={`${summary.metrics.ai_coverage}%`} icon={Bot} />
       </div>
 
-      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(280px,380px)]">
+      <div className="grid min-w-0 items-stretch gap-5 xl:grid-cols-2">
         <Panel title="Rating distribution" description="Current review mix across connected sources" icon={BarChart3}>
           <div className="space-y-3">
             {summary.rating_distribution.map((item) => (
@@ -997,7 +1028,7 @@ function Reviews(props: {
   const { selectedReview } = props;
 
   return (
-    <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,440px)]">
+    <div className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
       <Panel title="Review queue" description="Triage by source, urgency, rating and root cause" icon={Inbox}>
         <div className="mb-4 flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[6px] border border-[var(--line)] bg-[var(--surface-2)] px-3">
@@ -1119,7 +1150,7 @@ function Automations({
   runWorkflow: (workflow: AutomationWorkflow) => void;
 }) {
   return (
-    <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,430px)]">
+    <div className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
       <section className="grid min-w-0 gap-4">
         {workflows.map((workflow) => (
           <Panel key={workflow.id}>
@@ -1184,7 +1215,7 @@ function Webhooks({ ingestSampleReview, isMutating }: { ingestSampleReview: () =
   -d '{"customer_name":"Priya Shah","rating":1,"title":"No update on refund","body":"I returned my order last week and still have no refund update."}'`;
 
   return (
-    <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(280px,380px)]">
+    <div className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
       <Panel title="Review ingestion API" description="Public endpoints for platform and webhook integration" icon={Webhook}>
         <div className="grid min-w-0 gap-3 md:grid-cols-2">
           {[
@@ -1233,7 +1264,7 @@ function Panel({
   title?: string;
 }) {
   return (
-    <section className="min-w-0 overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_24px_70px_var(--shadow)] sm:p-5">
+    <section className="h-full min-w-0 overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_24px_70px_var(--shadow)] sm:p-5">
       {title && (
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
@@ -1285,7 +1316,7 @@ function ThemeToggle({
 function HeroMiniStat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="min-w-0 rounded-[18px] border border-[var(--line)] bg-[var(--surface-2)] p-4">
-      <p className="text-3xl font-semibold">{value}</p>
+      <p className="text-2xl font-semibold">{value}</p>
       <p className="mt-1 text-sm text-[var(--muted)]">{label}</p>
     </div>
   );
@@ -1303,7 +1334,7 @@ function MetricCard({
   value: string | number;
 }) {
   return (
-    <div className="min-w-0 rounded-[22px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_var(--shadow)]">
+    <div className="h-full min-w-0 rounded-[22px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_var(--shadow)]">
       <div className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <span className="min-w-0 pr-2 text-sm font-semibold leading-5 text-[var(--muted)]">{label}</span>
         <div
@@ -1316,7 +1347,7 @@ function MetricCard({
           <Icon size={19} />
         </div>
       </div>
-      <p className="text-4xl font-semibold tracking-normal">{value}</p>
+      <p className="text-3xl font-semibold tracking-normal">{value}</p>
     </div>
   );
 }
