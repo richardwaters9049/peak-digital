@@ -21,7 +21,6 @@ import {
   Moon,
   Play,
   PlugZap,
-  Radar,
   RefreshCcw,
   Search,
   ShieldCheck,
@@ -757,8 +756,8 @@ function LoginScreen({
           <ThemeToggle isDark={isDark} setTheme={setTheme} theme={theme} />
         </div>
 
-        <div className="grid flex-1 min-w-0 items-center gap-8 py-8 2xl:grid-cols-[minmax(0,1fr)_minmax(300px,420px)]">
-          <div className="min-w-0">
+        <div className="flex flex-1 min-w-0 items-center py-8">
+          <div className="w-full min-w-0">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--accent)] shadow-[0_14px_44px_var(--shadow)]">
               <ShieldCheck size={16} />
               Laravel, OpenAI, queues, webhooks
@@ -772,8 +771,6 @@ function LoginScreen({
 
             <WorkflowStrip selectedIndex={selectedWorkflowIndex} setSelectedIndex={setSelectedWorkflowIndex} />
           </div>
-
-          <ReviewRadar />
         </div>
       </section>
 
@@ -904,49 +901,6 @@ function WorkflowStrip({
             </span>
           </div>
           <p className="text-sm leading-6 text-[var(--muted)]">{selectedStep.description}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ReviewRadar() {
-  const signals = [
-    ["Refund delay", "high", "var(--danger)"],
-    ["Staff praise", "low", "var(--success)"],
-    ["Booking friction", "medium", "var(--accent)"],
-  ];
-
-  return (
-    <div className="min-w-0 rounded-[22px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_70px_var(--shadow)]">
-      <div className="mb-5 flex min-w-0 items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-[var(--muted)]">Live review radar</p>
-          <p className="mt-1 text-2xl font-semibold">2 high-urgency signals</p>
-        </div>
-        <div className="grid size-11 shrink-0 place-items-center rounded-[15px] bg-[var(--accent-soft)] text-[var(--accent)]">
-          <Radar size={22} />
-        </div>
-      </div>
-
-      <div className="grid min-w-0 gap-5 sm:grid-cols-[150px_minmax(0,1fr)] xl:grid-cols-1 2xl:grid-cols-[150px_minmax(0,1fr)]">
-        <div className="relative mx-auto size-[150px] shrink-0 rounded-full border border-[var(--line-strong)] bg-[var(--surface-2)]">
-          <div className="absolute left-1/2 top-1/2 size-[104px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--line)]" />
-          <div className="absolute left-1/2 top-1/2 size-[58px] -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-[var(--accent)]" />
-          <div className="absolute left-[58%] top-[24%] size-3 rounded-full bg-[var(--danger)] shadow-[0_0_0_8px_var(--danger-soft)]" />
-          <div className="absolute left-[35%] top-[64%] size-2.5 rounded-full bg-[var(--success)] shadow-[0_0_0_7px_var(--success-soft)]" />
-        </div>
-
-        <div className="grid min-w-0 gap-2">
-          {signals.map(([topic, level, color]) => (
-            <div key={topic} className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-3">
-              <span className="size-2.5 rounded-full" style={{ background: color }} />
-              <span className="truncate text-sm font-semibold">{topic}</span>
-              <span className="text-xs font-bold capitalize" style={{ color }}>
-                {level}
-              </span>
-            </div>
-          ))}
         </div>
       </div>
     </div>
