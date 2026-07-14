@@ -777,8 +777,8 @@ function LoginScreen({
         </div>
       </section>
 
-      <section className="flex min-w-0 items-center border-t border-[var(--line)] bg-[var(--surface)] px-4 py-8 shadow-[0_24px_90px_var(--shadow)] sm:px-6 lg:border-l lg:border-t-0 lg:px-7">
-        <div className="min-w-0 w-full rounded-[18px] border border-[var(--line)] bg-[var(--surface-2)] p-5 shadow-[0_24px_70px_var(--shadow)] sm:p-7">
+      <section className="grid min-w-0 place-items-center border-t border-[var(--line)] bg-[var(--surface)] px-4 py-8 shadow-[0_24px_90px_var(--shadow)] sm:px-6 lg:min-h-screen lg:border-l lg:border-t-0 lg:px-7">
+        <div className="w-full max-w-[420px] min-w-0 rounded-[18px] border border-[var(--line)] bg-[var(--surface-2)] p-5 shadow-[0_24px_70px_var(--shadow)] sm:p-7">
           <div className="mb-7">
             <p className="text-sm font-semibold text-[var(--accent)]">Secure demo access</p>
             <h2 className="mt-2 text-2xl font-semibold leading-tight">Enter the operations desk</h2>
