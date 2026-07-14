@@ -1,13 +1,13 @@
-# Peak Reviews AI Ops web application
+# Reputrail web application
 
-This directory contains the Next.js 16 and React 19 operations console for Peak Reviews AI Ops. The interface consumes the Laravel API through a server-side Next.js proxy.
+This directory contains the Next.js 16 and React 19 operations console for Reputrail. The interface consumes the Laravel API through a server-side Next.js proxy.
 
 ## Run the web application
 
 Run the complete stack from the repository root, `/Users/your-name/Documents/GitHub/peak-digital`:
 
 ```bash
-bash scripts/docker_peakDigital
+bash scripts/docker_reputrail
 ```
 
 The launcher builds the web application, API, and database, then prints and opens the selected local dashboard URL.
@@ -17,7 +17,7 @@ The launcher builds the web application, API, and database, then prints and open
 Run this command from the repository root:
 
 ```bash
-OPEN_BROWSER=0 bash scripts/docker_peakDigital test
+OPEN_BROWSER=0 bash scripts/docker_reputrail test
 ```
 
 The Docker build performs an optimised Next.js production build and TypeScript validation. The test command then runs ESLint inside the frontend container.

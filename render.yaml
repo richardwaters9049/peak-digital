@@ -10,7 +10,7 @@ services:
 
     envVars:
       - key: APP_NAME
-        value: Peak Reviews AI Ops API
+        value: Reputrail API
 
       - key: APP_ENV
         value: production

@@ -1,6 +1,10 @@
-# Peak Reviews AI Ops
+# Reputrail
 
-Peak Reviews AI Ops is a reputation operations console that turns incoming customer reviews into structured insight, safe reply drafts, recovery actions, and auditable automation runs.
+<img src="web/public/reputrail-mark.svg" alt="Reputrail logo" width="72">
+
+**Every review. A clear route forward.**
+
+Reputrail is a reputation operations console that turns incoming customer reviews into structured insight, safe reply drafts, recovery actions, and auditable automation runs.
 
 ## Live services
 
@@ -23,7 +27,7 @@ The browser communicates only with Next.js. Next.js proxies `/backend/*` request
 Run this command from the repository root, `/Users/your-name/Documents/GitHub/peak-digital`:
 
 ```bash
-bash scripts/docker_peakDigital
+bash scripts/docker_reputrail
 ```
 
 The launcher prints the automatically selected dashboard and API ports. The application does not require external credentials.
@@ -35,7 +39,7 @@ For all launcher commands, platform requirements, cloning instructions, and Open
 Run this command from the repository root:
 
 ```bash
-OPEN_BROWSER=0 bash scripts/docker_peakDigital test
+OPEN_BROWSER=0 bash scripts/docker_reputrail test
 ```
 
 The test command builds the production frontend, runs TypeScript validation as part of the Next.js build, executes the Laravel test suite, and runs ESLint.
@@ -72,7 +76,7 @@ See the [Laravel API README](api/README.md) for backend details and the [Next.js
 
 The launcher creates an ignored `.env` file beside `docker-compose.yml`. It contains local ports and generated development secrets. PostgreSQL data is stored in the named Docker volume `peak-reviews-ai-ops_postgres-data` and survives normal stop/start cycles.
 
-Use `bash scripts/docker_peakDigital reset` from the repository root only when you intend to delete the local database and reseed it.
+Use `bash scripts/docker_reputrail reset` from the repository root only when you intend to delete the local database and reseed it.
 
 ## CI/CD and Render
 

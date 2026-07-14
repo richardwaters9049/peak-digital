@@ -1,13 +1,13 @@
-# Peak Reviews AI Ops API
+# Reputrail API
 
-This directory contains the Laravel 13 API for Peak Reviews AI Ops. It owns review ingestion, analysis, reply drafting, operational summaries, automation execution, persistence, and AI audit records.
+This directory contains the Laravel 13 API for Reputrail. It owns review ingestion, analysis, reply drafting, operational summaries, automation execution, persistence, and AI audit records.
 
 ## Run the API as part of the application
 
 Run this command from the repository root, `/Users/your-name/Documents/GitHub/peak-digital`:
 
 ```bash
-bash scripts/docker_peakDigital
+bash scripts/docker_reputrail
 ```
 
 Docker Compose starts the API with PostgreSQL and the Next.js frontend. The launcher prints the selected local API URL after its health check passes.
@@ -17,7 +17,7 @@ Docker Compose starts the API with PostgreSQL and the Next.js frontend. The laun
 Run the complete project test command from the repository root:
 
 ```bash
-OPEN_BROWSER=0 bash scripts/docker_peakDigital test
+OPEN_BROWSER=0 bash scripts/docker_reputrail test
 ```
 
 The Laravel suite uses an in-memory SQLite database during automated tests. It covers deterministic AI analysis, webhook ingestion, dashboard metrics, reply drafting, and automation execution.
@@ -47,7 +47,7 @@ When credentials are absent or the provider response cannot be trusted, the serv
 
 Database migrations define businesses, locations, reviews, analyses, automation workflows, automation runs, users, cache records, jobs, and sessions. `DemoSeeder` provides fictional, repeatable data for local demonstrations.
 
-The local PostgreSQL volume survives normal stop and restart commands. Run `bash scripts/docker_peakDigital reset` from the repository root only when the data should be deleted and reseeded.
+The local PostgreSQL volume survives normal stop and restart commands. Run `bash scripts/docker_reputrail reset` from the repository root only when the data should be deleted and reseeded.
 
 ## Configuration
 

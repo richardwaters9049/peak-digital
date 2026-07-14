@@ -21,7 +21,7 @@ NC='\033[0m'
 banner() {
   printf "${PURPLE}"
   printf '%s\n' '╔════════════════════════════════════════════════════════╗'
-  printf '%s\n' '║  PEAK REVIEWS AI OPS                                  ║'
+  printf '%s\n' '║  REPUTRAIL                                            ║'
   printf '%s\n' '║  Laravel + Next.js + PostgreSQL + AI automation       ║'
   printf '%s\n' '╚════════════════════════════════════════════════════════╝'
   printf "${NC}"
@@ -238,7 +238,7 @@ show_urls() {
   local web_port api_port
   web_port="$(env_value WEB_PORT)"
   api_port="$(env_value API_PORT)"
-  printf "\n${GREEN}Peak Reviews AI Ops is ready.${NC}\n"
+  printf "\n${GREEN}Reputrail is ready.${NC}\n"
   printf '  Dashboard:  %s\n' "http://localhost:${web_port}"
   printf '  Laravel API: %s\n' "http://localhost:${api_port}/api/dashboard/summary"
   printf '  Health:      %s\n' "http://localhost:${api_port}/up"
@@ -394,7 +394,7 @@ case "$ACTION" in
     run_up
     ;;
   *)
-    printf 'Usage: scripts/docker_peakDigital [start|stop|restart|status|logs|test|reset]\n' >&2
+    printf 'Usage: scripts/docker_reputrail [start|stop|restart|status|logs|test|reset]\n' >&2
     exit 2
     ;;
 esac

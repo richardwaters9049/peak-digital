@@ -22,7 +22,7 @@ services:
     build:
       context: ./api
     environment:
-      APP_NAME: "Peak Reviews AI Ops API"
+      APP_NAME: "Reputrail API"
       APP_ENV: local
       APP_KEY: ${APP_KEY}
       APP_DEBUG: "true"

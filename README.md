@@ -1,19 +1,23 @@
-# Peak Digital AI operations platform
+# Reputrail
 
 [![CI](https://github.com/richardwaters9049/peak-digital/actions/workflows/ci.yml/badge.svg)](https://github.com/richardwaters9049/peak-digital/actions/workflows/ci.yml)
 
-This repository contains **Peak Reviews AI Ops**, a full-stack reputation operations console. It combines a Laravel API, Next.js dashboard, PostgreSQL, AI-assisted review analysis, automation workflows, webhook ingestion, and an auditable fallback path.
+<img src="projects/peak-reviews-ai-ops/web/public/reputrail-mark.svg" alt="Reputrail logo" width="72">
+
+**Every review. A clear route forward.**
+
+Reputrail is a full-stack reputation operations console. It combines a Laravel API, Next.js dashboard, PostgreSQL, AI-assisted review analysis, automation workflows, webhook ingestion, and an auditable fallback path.
 
 ## Live application
 
-- [Open Peak Reviews AI Ops](https://peak-reviews-ai-ops-web.onrender.com)
+- [Open Reputrail](https://peak-reviews-ai-ops-web.onrender.com)
 - [Check the Laravel API health endpoint](https://peak-reviews-ai-ops-api.onrender.com/up)
 
 The Render services use the free plan and may take a short time to wake after a period of inactivity.
 
 ## Application documentation
 
-The complete architecture, API surface, reliability approach, and production trade-offs are covered in the [Peak Reviews AI Ops application README](projects/peak-reviews-ai-ops/README.md).
+The complete architecture, API surface, reliability approach, and production trade-offs are covered in the [Reputrail application README](projects/peak-reviews-ai-ops/README.md).
 
 Component-specific guides are also available for the [Laravel API](projects/peak-reviews-ai-ops/api/README.md) and [Next.js web application](projects/peak-reviews-ai-ops/web/README.md).
 
@@ -33,7 +37,7 @@ cd peak-digital
 Run this command from the repository root, `peak-digital`:
 
 ```bash
-bash scripts/docker_peakDigital
+bash scripts/docker_reputrail
 ```
 
 The launcher detects the operating system and CPU architecture, selects free local ports, generates development-only secrets, builds every service, starts PostgreSQL, runs migrations and idempotent demo seeding, waits for health checks, and opens the dashboard when the platform supports it.
@@ -52,7 +56,7 @@ The terminal prints the selected dashboard and API URLs. No manual dependency in
 Docker must be running before the launcher starts. Set `OPEN_BROWSER=0` in headless or remote environments to prevent automatic browser opening:
 
 ```bash
-OPEN_BROWSER=0 bash scripts/docker_peakDigital
+OPEN_BROWSER=0 bash scripts/docker_reputrail
 ```
 
 ## Application controls
@@ -60,13 +64,13 @@ OPEN_BROWSER=0 bash scripts/docker_peakDigital
 Run every command below from the repository root, `peak-digital`:
 
 ```bash
-bash scripts/docker_peakDigital start
-bash scripts/docker_peakDigital stop
-bash scripts/docker_peakDigital restart
-bash scripts/docker_peakDigital status
-bash scripts/docker_peakDigital logs
-bash scripts/docker_peakDigital test
-bash scripts/docker_peakDigital reset
+bash scripts/docker_reputrail start
+bash scripts/docker_reputrail stop
+bash scripts/docker_reputrail restart
+bash scripts/docker_reputrail status
+bash scripts/docker_reputrail logs
+bash scripts/docker_reputrail test
+bash scripts/docker_reputrail reset
 ```
 
 - `start` builds and opens the application while preserving the existing database.
@@ -84,7 +88,7 @@ The application is fully usable without an OpenAI API key. When no key is suppli
 To use OpenAI for a local launch, run this command from the repository root:
 
 ```bash
-OPENAI_API_KEY=your-key bash scripts/docker_peakDigital
+OPENAI_API_KEY=your-key bash scripts/docker_reputrail
 ```
 
 Never commit an API key or generated environment file.
@@ -117,7 +121,7 @@ Local services run through Docker Compose and bind only to the loopback interfac
 .
 ├── .github/workflows/ci.yml             # GitHub Actions build and test workflow
 ├── render.yaml                           # Render web, API, and database blueprint
-├── scripts/docker_peakDigital            # Cross-platform application launcher
+├── scripts/docker_reputrail              # Cross-platform application launcher
 └── projects/peak-reviews-ai-ops
     ├── api/                              # Laravel API, AI services, data, and tests
     ├── web/                              # Next.js operations dashboard

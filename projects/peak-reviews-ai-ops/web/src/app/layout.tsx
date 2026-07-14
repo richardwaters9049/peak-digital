@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Peak Reviews AI Ops",
-  description: "AI-powered review operations console for local businesses.",
+  title: "Reputrail | Reputation operations",
+  description: "Turn every review into a clear, auditable route forward.",
+  icons: {
+    icon: "/reputrail-mark.svg",
+  },
 };
 
 export default function RootLayout({

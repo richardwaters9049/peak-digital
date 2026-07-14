@@ -27,13 +27,13 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Validate launcher
-        run: bash -n scripts/docker_peakDigital
+        run: bash -n scripts/docker_reputrail
 
       - name: Build and test application
         env:
           OPEN_BROWSER: "0"
-        run: scripts/docker_peakDigital test
+        run: scripts/docker_reputrail test
 
       - name: Clean up Docker resources
         if: always()
-        run: scripts/docker_peakDigital stop
+        run: scripts/docker_reputrail stop

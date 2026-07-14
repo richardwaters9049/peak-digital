@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Peak Reviews AI Ops</title>
+    <title>Reputrail | Reputation operations</title>
     <style>
         :root {
             color-scheme: dark;
@@ -50,14 +50,10 @@
             gap: 14px;
         }
         .mark {
-            display: grid;
+            display: block;
             width: 46px;
             height: 46px;
-            place-items: center;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #fff;
-            font-weight: 900;
+            border-radius: 13px;
             box-shadow: 0 18px 50px rgba(0,0,0,.35);
         }
         .eyebrow {
@@ -162,10 +158,10 @@
     <main>
         <section class="intro">
             <div class="brand">
-                <div class="mark">PR</div>
+                <img class="mark" src="/reputrail-mark.svg" alt="Reputrail logo">
                 <div>
-                    <strong>Peak Reviews</strong>
-                    <p style="margin: 2px 0 0;">AI Ops Console</p>
+                    <strong>Reputrail</strong>
+                    <p style="margin: 2px 0 0;">Every review. A clear route forward.</p>
                 </div>
             </div>
 
@@ -186,14 +182,14 @@
         <section class="login-wrap">
             <div class="login">
                 <p style="margin: 0 0 8px; color: var(--accent); font-weight: 800;">Secure demo access</p>
-                <h2>Log in to Peak Reviews</h2>
+                <h2>Log in to Reputrail</h2>
                 <p>Choose a seeded demo identity to enter the dashboard.</p>
                 <a class="identity" href="http://localhost:3001">
-                    <span><strong>Demo Operator</strong><br><span style="color: var(--muted);">operator@peakreviews.local</span></span>
+                    <span><strong>Demo Operator</strong><br><span style="color: var(--muted);">operator@reputrail.local</span></span>
                     <span class="role">Ops Lead</span>
                 </a>
                 <a class="identity" href="http://localhost:3001">
-                    <span><strong>Agency Admin</strong><br><span style="color: var(--muted);">admin@peakreviews.local</span></span>
+                    <span><strong>Agency Admin</strong><br><span style="color: var(--muted);">admin@reputrail.local</span></span>
                     <span class="role">Admin</span>
                 </a>
                 <div class="note">

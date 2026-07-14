@@ -273,8 +273,8 @@ const pageItemVariants: Variants = {
 };
 
 const demoUsers: Session[] = [
-  { name: "Demo Operator", email: "operator@peakreviews.local", role: "Ops Lead" },
-  { name: "Agency Admin", email: "admin@peakreviews.local", role: "Admin" },
+  { name: "Demo Operator", email: "operator@reputrail.local", role: "Ops Lead" },
+  { name: "Agency Admin", email: "admin@reputrail.local", role: "Admin" },
 ];
 
 const workflowSteps: { label: string; icon: LucideIcon; description: string }[] = [
@@ -591,7 +591,7 @@ export default function Home() {
           <section className="mx-auto min-h-screen w-full max-w-[1680px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
         <div className="mb-5 flex min-w-0 items-end justify-between gap-4 border-b border-[var(--line)] pb-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">Peak Reviews / Workspace</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">Reputrail / Workspace</p>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={activeTab}
@@ -620,7 +620,7 @@ export default function Home() {
               Turn reputation signals into recoverable customer moments.
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
-              A Peak Reviews workspace for ingestion, AI triage, reply drafting, and follow-up automation across every location.
+              Reputrail brings ingestion, AI triage, reply drafting, and follow-up automation into one auditable workspace.
             </p>
           </div>
           <div className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--surface-2)] p-5 shadow-[0_18px_52px_var(--shadow)]">
@@ -774,26 +774,34 @@ function LoginScreen({
       <SignalRail selectedIndex={selectedWorkflowIndex} setSelectedIndex={setSelectedWorkflowIndex} />
 
       <section className="flex min-h-[62vh] min-w-0 flex-col px-4 py-6 sm:px-8 lg:min-h-screen lg:px-10 xl:px-14">
-        <div className="flex min-w-0 flex-wrap items-center justify-between gap-4">
-          <BrandMark />
+        <div className="flex min-w-0 justify-end">
           <ThemeToggle isDark={isDark} setTheme={setTheme} theme={theme} />
         </div>
 
         <div className="flex flex-1 min-w-0 items-center py-8">
-          <div className="w-full min-w-0">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--accent)] shadow-[0_14px_44px_var(--shadow)]">
+          <motion.div
+            variants={pageContainerVariants}
+            initial="hidden"
+            animate="visible"
+            className="w-full min-w-0"
+          >
+            <LoginBrandHero />
+
+            <motion.div variants={pageItemVariants} className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--accent)] shadow-[0_14px_44px_var(--shadow)]">
               <ShieldCheck size={16} />
               Laravel, OpenAI, queues, webhooks
-            </div>
-            <h1 className="max-w-4xl break-words text-3xl font-semibold leading-tight tracking-normal text-[var(--text)] sm:text-4xl xl:text-5xl">
+            </motion.div>
+            <motion.h1 variants={pageItemVariants} className="max-w-4xl break-words text-3xl font-semibold leading-tight tracking-normal text-[var(--text)] sm:text-4xl xl:text-5xl">
               Make every public review feel recoverable.
-            </h1>
-            <p className="mt-6 max-w-3xl text-base leading-7 text-[var(--muted)] sm:text-lg sm:leading-8">
+            </motion.h1>
+            <motion.p variants={pageItemVariants} className="mt-6 max-w-3xl text-base leading-7 text-[var(--muted)] sm:text-lg sm:leading-8">
               A calm operations desk for local-business teams: ingest review signals, ask AI what matters, draft a brand-safe response, and trigger the right follow-up.
-            </p>
+            </motion.p>
 
-            <WorkflowStrip selectedIndex={selectedWorkflowIndex} setSelectedIndex={setSelectedWorkflowIndex} />
-          </div>
+            <motion.div variants={pageItemVariants}>
+              <WorkflowStrip selectedIndex={selectedWorkflowIndex} setSelectedIndex={setSelectedWorkflowIndex} />
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -851,9 +859,7 @@ function SignalRail({
 }) {
   return (
     <aside className="hidden min-h-screen border-r border-[var(--line)] bg-[var(--surface)] px-3 py-7 text-[var(--text)] lg:flex lg:flex-col lg:items-center lg:gap-5">
-      <div className="grid size-14 place-items-center rounded-[16px] bg-[var(--accent)] text-xs font-bold text-white shadow-[0_18px_50px_var(--shadow)]">
-        PR
-      </div>
+      <ReputrailMark className="size-14 shrink-0 shadow-[0_18px_50px_var(--shadow)]" />
       {workflowSteps.map((step, index) => (
         <button
           key={step.label}
@@ -1029,8 +1035,13 @@ function AppSidebar({
                     <X size={14} strokeWidth={2.2} />
                   </button>
                 </div>
-                <p className="mt-3 whitespace-nowrap text-lg font-semibold leading-tight">Peak Reviews</p>
-                <p className="mt-1 whitespace-nowrap text-xs text-[var(--muted)]">AI Ops Console</p>
+                <div className="mt-3 flex items-center gap-3">
+                  <ReputrailMark className="size-9 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="whitespace-nowrap text-lg font-semibold leading-tight">Reputrail</p>
+                    <p className="mt-1 whitespace-nowrap text-xs text-[var(--muted)]">Reputation Operations</p>
+                  </div>
+                </div>
               </div>
 
               <nav className="mt-6 grid gap-2">
@@ -1612,17 +1623,84 @@ function Panel({
   );
 }
 
-function BrandMark({ compact = false }: { compact?: boolean }) {
+function LoginBrandHero() {
   return (
-    <div className="flex min-w-0 items-center gap-3">
-      <div className="grid size-11 place-items-center rounded-[16px] bg-[var(--accent)] text-white shadow-[0_18px_50px_var(--shadow)]">
-        <Sparkles size={22} />
+    <motion.div variants={pageItemVariants} className="relative mb-10 flex min-w-0 flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
+      <div className="relative grid size-28 shrink-0 place-items-center sm:size-32 xl:size-40">
+        <motion.span
+          aria-hidden="true"
+          initial={{ opacity: 0, scale: 0.45 }}
+          animate={{ opacity: [0, 0.72, 0.42], scale: [0.45, 1.12, 1] }}
+          transition={{ duration: 1.45, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-2 rounded-[34%] bg-[var(--accent)] blur-2xl"
+        />
+        <motion.span
+          aria-hidden="true"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 18, ease: "linear", repeat: Infinity }}
+          className="absolute inset-0 rounded-[38%] border border-dashed border-[var(--line-strong)]"
+        >
+          <span className="absolute left-1/2 top-[-4px] size-2 -translate-x-1/2 rounded-full bg-[var(--accent)] shadow-[0_0_18px_var(--accent)]" />
+        </motion.span>
+        <motion.div
+          initial={{ opacity: 0, rotate: -10, scale: 0.64, y: 22 }}
+          animate={{ opacity: 1, rotate: 0, scale: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 92, damping: 15, mass: 0.9 }}
+          className="relative"
+        >
+          <ReputrailMark className="size-20 drop-shadow-[0_24px_48px_var(--shadow)] sm:size-24 xl:size-28" />
+        </motion.div>
       </div>
-      <div className={compact ? "hidden min-w-0 sm:block" : "min-w-0"}>
-        <p className="text-base font-semibold">Peak Reviews</p>
-        <p className="text-xs text-[var(--muted)]">AI Ops Console</p>
+
+      <div className="min-w-0">
+        <motion.p
+          initial={{ opacity: 0, x: -22 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+          className="break-words text-4xl font-semibold tracking-[-0.045em] text-[var(--text)] sm:text-5xl xl:text-6xl"
+        >
+          Reputrail
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.34, duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-3 max-w-md text-sm font-semibold uppercase leading-6 tracking-[0.16em] text-[var(--accent)] sm:text-base"
+        >
+          Every review. A clear route forward.
+        </motion.p>
+        <motion.div
+          aria-hidden="true"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.48, duration: 0.82, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-5 h-px w-full max-w-sm origin-left bg-[linear-gradient(90deg,var(--accent),var(--line-strong),transparent)]"
+        />
       </div>
-    </div>
+    </motion.div>
+  );
+}
+
+function ReputrailMark({ className = "size-11" }: { className?: string }) {
+  return (
+    <svg
+      aria-label="Reputrail"
+      className={className}
+      role="img"
+      viewBox="0 0 64 64"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="64" height="64" rx="18" fill="#071e2b" />
+      <rect x="1" y="1" width="62" height="62" rx="17" fill="none" stroke="#74ccf1" strokeOpacity=".24" strokeWidth="2" />
+      <rect x="15.5" y="15.5" width="5" height="34" rx="2.5" fill="#5ee1f3" />
+      <rect x="18" y="15.5" width="29" height="5" rx="2.5" fill="#5ee1f3" />
+      <rect x="42" y="18" width="5" height="19" rx="2.5" fill="#5ee1f3" />
+      <rect x="18" y="34" width="29" height="5" rx="2.5" fill="#5ee1f3" />
+      <polygon points="31,36 35,33 50,48 46,52" fill="#5ee1f3" />
+      <circle cx="18" cy="18" r="3.5" fill="#e9fbff" />
+      <circle cx="47" cy="28.7" r="3.5" fill="#5ee1f3" />
+      <circle cx="48" cy="49" r="3.5" fill="#17a9e8" />
+    </svg>
   );
 }
 
