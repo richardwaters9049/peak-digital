@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import {
   AlertTriangle,
   BarChart3,
@@ -247,6 +247,29 @@ const pageDetails: Record<Tab, { title: string; description: string }> = {
     title: "Webhook activity",
     description: "Inspect and test the events entering the review operations workspace.",
   },
+};
+
+const pageFrameVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] as const } },
+};
+
+const pageContainerVariants: Variants = {
+  hidden: {},
+  visible: { transition: { delayChildren: 0.04, staggerChildren: 0.09 } },
+  exit: { transition: { staggerChildren: 0.025, staggerDirection: -1 } },
+};
+
+const pageItemVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.985, y: 16 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.52, ease: [0.16, 1, 0.3, 1] as const },
+  },
+  exit: { opacity: 0, y: -6, transition: { duration: 0.14, ease: [0.4, 0, 1, 1] as const } },
 };
 
 const demoUsers: Session[] = [
@@ -625,12 +648,12 @@ export default function Home() {
 
         <AnimatePresence mode="wait">
           {activeTab === "dashboard" && (
-            <motion.div key="dashboard" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+            <motion.div key="dashboard" variants={pageFrameVariants} initial="hidden" animate="visible" exit="exit">
               <Dashboard summary={summary} />
             </motion.div>
           )}
           {activeTab === "reviews" && (
-            <motion.div key="reviews" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+            <motion.div key="reviews" variants={pageFrameVariants} initial="hidden" animate="visible" exit="exit">
               <Reviews
                 analyseReview={analyseReview}
                 isMutating={isMutating}
@@ -647,12 +670,12 @@ export default function Home() {
             </motion.div>
           )}
           {activeTab === "automations" && (
-            <motion.div key="automations" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+            <motion.div key="automations" variants={pageFrameVariants} initial="hidden" animate="visible" exit="exit">
               <Automations workflows={workflows} runs={runs} isMutating={isMutating} runWorkflow={runWorkflow} />
             </motion.div>
           )}
           {activeTab === "webhooks" && (
-            <motion.div key="webhooks" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+            <motion.div key="webhooks" variants={pageFrameVariants} initial="hidden" animate="visible" exit="exit">
               <Webhooks ingestSampleReview={ingestSampleReview} isMutating={isMutating} />
             </motion.div>
           )}
@@ -1110,7 +1133,7 @@ function Dashboard({ summary }: { summary: DashboardSummary }) {
   const maxRatingCount = Math.max(...summary.rating_distribution.map((item) => item.count), 1);
 
   return (
-    <div className="min-w-0 space-y-6">
+    <motion.div variants={pageContainerVariants} className="min-w-0 space-y-6">
       <section className="grid min-w-0 items-stretch gap-5 xl:grid-cols-3">
         <RecoveryQueue summary={summary} />
         <Panel>
@@ -1193,13 +1216,13 @@ function Dashboard({ summary }: { summary: DashboardSummary }) {
           </div>
         </Panel>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function RecoveryQueue({ summary }: { summary: DashboardSummary }) {
   return (
-    <aside className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--text)] p-5 text-[var(--app-bg)] shadow-[0_24px_70px_var(--shadow)] xl:h-full">
+    <motion.aside variants={pageItemVariants} className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--text)] p-5 text-[var(--app-bg)] shadow-[0_24px_70px_var(--shadow)] xl:h-full">
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.06em] text-[var(--accent)]">Recovery queue</p>
@@ -1229,7 +1252,7 @@ function RecoveryQueue({ summary }: { summary: DashboardSummary }) {
           </div>
         ))}
       </div>
-    </aside>
+    </motion.aside>
   );
 }
 
@@ -1249,7 +1272,7 @@ function Reviews(props: {
   const { selectedReview } = props;
 
   return (
-    <div className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
+    <motion.div variants={pageContainerVariants} className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
       <Panel title="Review queue" description="Triage by source, urgency, rating and root cause" icon={Inbox}>
         <div className="mb-4 flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[6px] border border-[var(--line)] bg-[var(--surface-2)] px-3">
@@ -1355,7 +1378,7 @@ function Reviews(props: {
           </div>
         </Panel>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -1371,7 +1394,7 @@ function Automations({
   runWorkflow: (workflow: AutomationWorkflow) => void;
 }) {
   return (
-    <div className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
+    <motion.div variants={pageContainerVariants} className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
       <section className="grid min-w-0 gap-4">
         {workflows.map((workflow) => (
           <Panel key={workflow.id}>
@@ -1479,7 +1502,7 @@ function Automations({
           </div>
         </Panel>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -1501,7 +1524,7 @@ function Webhooks({ ingestSampleReview, isMutating }: { ingestSampleReview: () =
   };
 
   return (
-    <div className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
+    <motion.div variants={pageContainerVariants} className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
       <Panel title="Review ingestion API" description="Public endpoints for platform and webhook integration" icon={Webhook}>
         <div className="grid min-w-0 gap-3 md:grid-cols-2">
           {[
@@ -1547,7 +1570,7 @@ function Webhooks({ ingestSampleReview, isMutating }: { ingestSampleReview: () =
           Send sample webhook
         </button>
       </Panel>
-    </div>
+    </motion.div>
   );
 }
 
@@ -1563,7 +1586,10 @@ function Panel({
   title?: string;
 }) {
   return (
-    <section className="relative h-full min-w-0 overflow-hidden rounded-[24px] border border-[var(--line-strong)] bg-[linear-gradient(145deg,var(--surface)_0%,var(--surface-2)_100%)] p-4 shadow-[0_24px_70px_var(--shadow)] sm:p-5">
+    <motion.section
+      variants={pageItemVariants}
+      className="relative h-full min-w-0 overflow-hidden rounded-[24px] border border-[var(--line-strong)] bg-[linear-gradient(145deg,var(--surface)_0%,var(--surface-2)_100%)] p-4 shadow-[0_24px_70px_var(--shadow)] sm:p-5"
+    >
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--accent),transparent)] opacity-80"
@@ -1582,7 +1608,7 @@ function Panel({
         </div>
       )}
       {children}
-    </section>
+    </motion.section>
   );
 }
 
@@ -1641,7 +1667,10 @@ function MetricCard({
   value: string | number;
 }) {
   return (
-    <div className="relative h-full min-w-0 overflow-hidden rounded-[22px] border border-[var(--line)] bg-[linear-gradient(155deg,var(--surface)_0%,var(--surface-2)_100%)] p-5 shadow-[0_18px_50px_var(--shadow)]">
+    <motion.div
+      variants={pageItemVariants}
+      className="relative h-full min-w-0 overflow-hidden rounded-[22px] border border-[var(--line)] bg-[linear-gradient(155deg,var(--surface)_0%,var(--surface-2)_100%)] p-5 shadow-[0_18px_50px_var(--shadow)]"
+    >
       <span aria-hidden="true" className="absolute inset-y-5 left-0 w-1 rounded-r-full bg-[var(--accent)] opacity-75" />
       <div className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <span className="min-w-0 pr-2 text-sm font-semibold leading-5 text-[var(--muted)]">{label}</span>
@@ -1656,7 +1685,7 @@ function MetricCard({
         </div>
       </div>
       <p className="text-3xl font-semibold tracking-normal">{value}</p>
-    </div>
+    </motion.div>
   );
 }
 
