@@ -9,6 +9,7 @@ import {
   CircleDot,
   ClipboardList,
   Code2,
+  Copy,
   Filter,
   Gauge,
   GitBranch,
@@ -29,6 +30,7 @@ import {
   Sun,
   UserRound,
   Webhook,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
@@ -229,6 +231,25 @@ const navItems = [
   { id: "webhooks" as const, label: "API" },
 ];
 
+const pageDetails: Record<Tab, { title: string; description: string }> = {
+  dashboard: {
+    title: "Operations overview",
+    description: "Live reputation signals and recovery performance across every location.",
+  },
+  reviews: {
+    title: "Review queue",
+    description: "Prioritise, analyse, and respond to incoming customer feedback.",
+  },
+  automations: {
+    title: "Automation studio",
+    description: "Manage the workflows that turn review signals into action.",
+  },
+  webhooks: {
+    title: "Webhook activity",
+    description: "Inspect and test the events entering the review operations workspace.",
+  },
+};
+
 const demoUsers: Session[] = [
   { name: "Demo Operator", email: "operator@peakreviews.local", role: "Ops Lead" },
   { name: "Agency Admin", email: "admin@peakreviews.local", role: "Admin" },
@@ -277,6 +298,12 @@ const themeVars: Record<ThemeMode, CSSProperties> = {
     "--success": "#67ddfe",
     "--success-soft": "rgba(103, 221, 254, 0.14)",
     "--shadow": "rgba(0, 0, 0, 0.38)",
+    "--scroll-control-bg": "#081e2b",
+    "--scroll-control-bg-end": "#0b2636",
+    "--scroll-control-border": "rgba(116, 204, 241, 0.42)",
+    "--scroll-control-fg": "#17a9e8",
+    "--scroll-control-glow": "rgba(0, 0, 0, 0.38)",
+    "--scroll-control-inner": "rgba(255, 255, 255, 0.08)",
   } as CSSProperties,
   light: {
     "--app-bg": "#e8f6fd",
@@ -297,6 +324,12 @@ const themeVars: Record<ThemeMode, CSSProperties> = {
     "--success": "#1287ba",
     "--success-soft": "rgba(18, 135, 186, 0.14)",
     "--shadow": "rgba(3, 24, 32, 0.12)",
+    "--scroll-control-bg": "#0e668b",
+    "--scroll-control-bg-end": "#17a9e8",
+    "--scroll-control-border": "rgba(6, 21, 30, 0.24)",
+    "--scroll-control-fg": "#ffffff",
+    "--scroll-control-glow": "rgba(14, 102, 139, 0.3)",
+    "--scroll-control-inner": "rgba(255, 255, 255, 0.3)",
   } as CSSProperties,
 };
 
@@ -343,6 +376,7 @@ export default function Home() {
   const [source, setSource] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
+  const [isNavigationOpen, setIsNavigationOpen] = useState(false);
   const [notice, setNotice] = useState("Demo fallback ready");
 
   const selectedReview = reviews.find((review) => review.id === selectedReviewId) ?? reviews[0];
@@ -383,6 +417,16 @@ export default function Home() {
     void refreshData();
   }, [refreshData]);
 
+  useEffect(() => {
+    const colourScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const applySystemTheme = () => setTheme(colourScheme.matches ? "dark" : "light");
+
+    applySystemTheme();
+    colourScheme.addEventListener("change", applySystemTheme);
+
+    return () => colourScheme.removeEventListener("change", applySystemTheme);
+  }, []);
+
   async function analyseReview(review: Review) {
     setIsMutating(true);
     try {
@@ -396,6 +440,29 @@ export default function Home() {
     }
   }
 
+  function revealRunTimeline() {
+    setActiveTab("automations");
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        document.getElementById("run-timeline")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }
+
+  function logIn(user: Session) {
+    setIsNavigationOpen(false);
+    setActiveTab("dashboard");
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    setSession(user);
+  }
+
+  function logOut() {
+    setIsNavigationOpen(false);
+    setActiveTab("dashboard");
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    setSession(null);
+  }
+
   async function runWorkflow(workflow: AutomationWorkflow) {
     setIsMutating(true);
     try {
@@ -405,18 +472,20 @@ export default function Home() {
       });
       setRuns((current) => [run, ...current]);
       setNotice(`${workflow.name} completed`);
+      revealRunTimeline();
     } catch {
       const run: AutomationRun = {
         id: 1000 + runs.length,
         status: "completed",
         payload: { triggered_by: "frontend_fallback" },
         events: workflow.steps.map((step, index) => ({ ...step, step: index + 1, status: "completed" })),
-        ran_at: "2026-07-09T10:00:00.000Z",
+        ran_at: new Date().toISOString(),
         workflow: { id: workflow.id, name: workflow.name },
         review: selectedReview,
       };
       setRuns((current) => [run, ...current]);
       setNotice("Fallback automation timeline created");
+      revealRunTimeline();
     } finally {
       setIsMutating(false);
     }
@@ -475,7 +544,7 @@ export default function Home() {
           isDark={isDark}
           setTheme={setTheme}
           theme={theme}
-          onLogin={setSession}
+          onLogin={logIn}
         />
       </div>
     );
@@ -483,31 +552,56 @@ export default function Home() {
 
   return (
     <main style={themeVars[theme]} className="min-h-screen overflow-x-hidden bg-[var(--app-bg)] text-[var(--text)]">
-      <AppSidebar
-        activeTab={activeTab}
-        isDark={isDark}
-        onLogout={() => setSession(null)}
-        session={session}
-        setActiveTab={setActiveTab}
-        setTheme={setTheme}
-        theme={theme}
-      />
+      <div className="flex min-h-screen w-full items-stretch">
+        <AppSidebar
+          activeTab={activeTab}
+          isDark={isDark}
+          isOpen={isNavigationOpen}
+          onLogout={logOut}
+          session={session}
+          setActiveTab={setActiveTab}
+          setIsOpen={setIsNavigationOpen}
+          setTheme={setTheme}
+          theme={theme}
+        />
 
-      <section className="mx-auto min-h-screen w-full max-w-[1680px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+        <motion.div layout className="min-w-0 flex-1" transition={{ layout: { duration: 0.36, ease: [0.22, 1, 0.36, 1] } }}>
+          <section className="mx-auto min-h-screen w-full max-w-[1680px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+        <div className="mb-5 flex min-w-0 items-end justify-between gap-4 border-b border-[var(--line)] pb-4">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">Peak Reviews / Workspace</p>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{pageDetails[activeTab].title}</h1>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--muted)]">{pageDetails[activeTab].description}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          <span className="hidden shrink-0 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xs font-bold text-[var(--muted)] sm:inline-flex">
+            {String(navItems.findIndex((item) => item.id === activeTab) + 1).padStart(2, "0")} / {String(navItems.length).padStart(2, "0")}
+          </span>
+        </div>
+
         <header className="mb-5 grid min-w-0 items-stretch gap-5 xl:grid-cols-2">
-          <div className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_70px_var(--shadow)] sm:p-7">
+          <div className="min-w-0 rounded-[24px] border border-[var(--line-strong)] bg-[linear-gradient(145deg,var(--surface)_0%,var(--accent-soft)_180%)] p-5 shadow-[0_24px_70px_var(--shadow)] sm:p-7">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--accent-soft)] px-3 py-2 text-sm font-semibold text-[var(--accent)]">
               <Sparkles size={16} />
               AI-native review operations
             </div>
-            <h1 className="max-w-4xl break-words text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
+            <h2 className="max-w-4xl break-words text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
               Turn reputation signals into recoverable customer moments.
-            </h1>
+            </h2>
             <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
               A Peak Reviews workspace for ingestion, AI triage, reply drafting, and follow-up automation across every location.
             </p>
           </div>
-          <div className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_70px_var(--shadow)]">
+          <div className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--surface-2)] p-5 shadow-[0_18px_52px_var(--shadow)]">
             <p className="text-sm font-semibold text-[var(--muted)]">Demo control</p>
             <p className="mt-2 text-sm leading-6 text-[var(--faint)]">{notice}</p>
             <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -564,8 +658,79 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
-      </section>
+          </section>
+        </motion.div>
+      </div>
+      <ScrollJumpButton />
     </main>
+  );
+}
+
+function ScrollJumpButton() {
+  const [isScrollable, setIsScrollable] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(false);
+
+  useEffect(() => {
+    const updateScrollState = () => {
+      const maximumScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+      setIsScrollable(maximumScroll > 40);
+      setIsAtBottom(maximumScroll > 0 && window.scrollY >= maximumScroll - 24);
+    };
+
+    const resizeObserver = new ResizeObserver(updateScrollState);
+    resizeObserver.observe(document.documentElement);
+    resizeObserver.observe(document.body);
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+    updateScrollState();
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, []);
+
+  const jumpToPageEdge = () => {
+    window.scrollTo({
+      top: isAtBottom ? 0 : document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <AnimatePresence>
+      {isScrollable && (
+        <motion.button
+          type="button"
+          aria-label={isAtBottom ? "Scroll to the top of the page" : "Scroll to the bottom of the page"}
+          title={isAtBottom ? "Back to top" : "More below"}
+          onClick={jumpToPageEdge}
+          initial={{ opacity: 0, scale: 0.84, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.84, y: 8 }}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+          style={{ background: "linear-gradient(145deg, var(--scroll-control-bg), var(--scroll-control-bg-end))" }}
+          className="fixed bottom-5 right-5 z-40 grid size-11 cursor-pointer place-items-center rounded-[15px] border border-[var(--scroll-control-border)] text-[var(--scroll-control-fg)] shadow-[0_14px_36px_var(--scroll-control-glow)] backdrop-blur-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-bg)]"
+        >
+          <span aria-hidden="true" className="pointer-events-none absolute inset-[3px] rounded-[12px] border border-[var(--scroll-control-inner)]" />
+          <motion.span
+            aria-hidden="true"
+            animate={{ rotate: isAtBottom ? 180 : 0 }}
+            transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: "5px solid transparent",
+              borderRight: "5px solid transparent",
+              borderTop: "7px solid currentColor",
+            }}
+          />
+        </motion.button>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -791,146 +956,199 @@ function ReviewRadar() {
 function AppSidebar({
   activeTab,
   isDark,
+  isOpen,
   onLogout,
   session,
   setActiveTab,
+  setIsOpen,
   setTheme,
   theme,
 }: {
   activeTab: Tab;
   isDark: boolean;
+  isOpen: boolean;
   onLogout: () => void;
   session: Session;
   setActiveTab: (tab: Tab) => void;
+  setIsOpen: (isOpen: boolean) => void;
   setTheme: (theme: ThemeMode) => void;
   theme: ThemeMode;
 }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const spring = { type: "spring" as const, stiffness: 310, damping: 25, mass: 0.82 };
+  const railTransition = isOpen
+    ? { duration: 1.05, ease: [0.16, 1, 0.3, 1] as const }
+    : { duration: 0.82, ease: [0.4, 0, 0.2, 1] as const };
+  const panelTransition = isOpen
+    ? { duration: 1, ease: [0.16, 1, 0.3, 1] as const }
+    : { duration: 0.68, ease: [0.4, 0, 0.2, 1] as const };
 
   return (
-    <motion.aside
+    <>
+      <motion.div
+        aria-hidden="true"
+        animate={{ width: isOpen ? 300 : 120 }}
+        initial={false}
+        transition={railTransition}
+        style={{ maxWidth: "70vw" }}
+        className="h-screen shrink-0"
+      />
+      <motion.aside
       aria-label="Primary navigation"
-      animate={{
-        height: isMenuOpen ? "min(560px, calc(100vh - 32px))" : 88,
-        width: isMenuOpen ? 316 : 52,
-      }}
+      animate={{ width: isOpen ? 300 : 120 }}
       initial={false}
-      transition={spring}
-      onMouseLeave={() => setIsMenuOpen(false)}
+      transition={railTransition}
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
       onBlurCapture={(event) => {
         const nextTarget = event.relatedTarget;
         if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
-          setIsMenuOpen(false);
+          setIsOpen(false);
         }
       }}
       onKeyDown={(event) => {
-        if (event.key === "Escape") setIsMenuOpen(false);
+        if (event.key === "Escape") setIsOpen(false);
       }}
-      className="fixed left-0 top-1/2 z-40 -translate-y-1/2 overflow-visible"
+      style={{ maxWidth: "70vw" }}
+      className={`fixed inset-y-0 left-0 z-30 h-screen overflow-hidden ${isOpen ? "" : "cursor-pointer"}`}
     >
       <motion.div
-        id="primary-navigation-menu"
-        aria-hidden={!isMenuOpen}
-        inert={!isMenuOpen}
         animate={{
-          opacity: isMenuOpen ? 1 : 0,
-          scaleX: isMenuOpen ? 1 : 0.72,
-          x: isMenuOpen ? 0 : -286,
+          opacity: isOpen ? 1 : 0,
+          clipPath: isOpen
+            ? "inset(0% 0% 0% 0% round 0px 26px 26px 0px)"
+            : "inset(46% 0% 46% 74% round 999px 0px 0px 999px)",
         }}
         initial={false}
-        transition={spring}
-        style={{ transformOrigin: "left center" }}
-        className="absolute left-0 top-1/2 flex h-[min(560px,calc(100vh-32px))] w-[280px] -translate-y-1/2 flex-col overflow-hidden rounded-r-[34px] border border-l-0 border-[var(--line)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] p-6 shadow-[18px_0_70px_var(--shadow)] backdrop-blur-xl"
+        transition={panelTransition}
+        style={{ transformOrigin: "right center" }}
+        className="absolute inset-y-3 left-0 right-0 overflow-hidden rounded-r-[26px] border border-l-0 border-[var(--line)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] shadow-[10px_0_36px_var(--shadow)] backdrop-blur-xl"
       >
-        <div className="border-b border-[var(--line)] pb-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">Workspace</p>
-          <p className="mt-2 text-xl font-semibold">Peak Reviews</p>
-          <p className="mt-1 text-sm text-[var(--muted)]">AI Ops Console</p>
-        </div>
-
-        <nav className="mt-6 grid gap-2">
-          {navItems.map((item, index) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                setIsMenuOpen(false);
+        <AnimatePresence initial={false}>
+          {isOpen && (
+            <motion.div
+              id="primary-navigation-menu"
+              initial={{ opacity: 0, x: -14 }}
+              animate={{
+                opacity: 1,
+                x: 0,
+                transition: { duration: 0.82, ease: [0.16, 1, 0.3, 1] },
               }}
-              aria-current={activeTab === item.id ? "page" : undefined}
-              className={`grid h-12 grid-cols-[32px_minmax(0,1fr)_8px] items-center gap-3 rounded-[16px] border px-3 text-left text-sm font-semibold transition ${
-                activeTab === item.id
-                  ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
-                  : "border-transparent text-[var(--muted)] hover:border-[var(--line)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-              }`}
+              exit={{
+                opacity: 0,
+                x: -10,
+                transition: { duration: 0.2, ease: [0.4, 0, 1, 1] },
+              }}
+              className="flex h-full w-[300px] min-w-[300px] flex-col p-6 pr-[64px]"
             >
-              <span className="text-xs font-bold tabular-nums opacity-70">{String(index + 1).padStart(2, "0")}</span>
-              <span>{item.label}</span>
-              <span className={`size-1.5 rounded-full ${activeTab === item.id ? "bg-[var(--accent)]" : "bg-transparent"}`} />
-            </button>
-          ))}
-        </nav>
+              <div className="border-b border-[var(--line)] px-1 pb-5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">Workspace</p>
+                  <button
+                    type="button"
+                    aria-label="Close navigation menu"
+                    title="Close navigation"
+                    onClick={() => setIsOpen(false)}
+                    className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface-2)] text-[var(--muted)] transition duration-300 hover:border-[var(--line-strong)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                  >
+                    <X size={14} strokeWidth={2.2} />
+                  </button>
+                </div>
+                <p className="mt-3 whitespace-nowrap text-lg font-semibold leading-tight">Peak Reviews</p>
+                <p className="mt-1 whitespace-nowrap text-xs text-[var(--muted)]">AI Ops Console</p>
+              </div>
 
-        <div className="mt-auto border-t border-[var(--line)] pt-5">
-          <div className="mb-4 min-w-0">
-            <p className="truncate text-sm font-semibold">{session.name}</p>
-            <p className="mt-1 truncate text-xs text-[var(--muted)]">{session.role}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-10 rounded-full border border-[var(--line)] bg-[var(--surface-2)] px-3 text-xs font-semibold text-[var(--text)]"
-            >
-              {isDark ? "Light mode" : "Dark mode"}
-            </button>
-            <button
-              onClick={onLogout}
-              className="h-10 rounded-full border border-transparent px-3 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--line)] hover:bg-[var(--surface-2)]"
-            >
-              Log out
-            </button>
-          </div>
-        </div>
+              <nav className="mt-6 grid gap-2">
+                {navItems.map((item, index) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsOpen(false);
+                      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+                    }}
+                    aria-current={activeTab === item.id ? "page" : undefined}
+                    className={`grid h-12 grid-cols-[28px_minmax(0,1fr)_8px] items-center gap-3 rounded-[15px] border px-3 text-left text-sm font-semibold transition ${
+                      activeTab === item.id
+                        ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
+                        : "border-transparent text-[var(--muted)] hover:border-[var(--line)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                    }`}
+                  >
+                    <span className="text-xs font-bold tabular-nums opacity-60">{String(index + 1).padStart(2, "0")}</span>
+                    <span>{item.label}</span>
+                    <span className={`size-1.5 rounded-full ${activeTab === item.id ? "bg-[var(--accent)]" : "bg-transparent"}`} />
+                  </button>
+                ))}
+              </nav>
+
+              <div className="mt-auto border-t border-[var(--line)] pt-5">
+                <p className="truncate text-sm font-semibold">{session.name}</p>
+                <p className="mt-1 truncate text-xs text-[var(--muted)]">{session.role}</p>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="h-10 rounded-full border border-[var(--line)] bg-[var(--surface-2)] px-3 text-xs font-semibold text-[var(--text)]"
+                  >
+                    {isDark ? "Light" : "Dark"}
+                  </button>
+                  <button
+                    onClick={onLogout}
+                    className="h-10 whitespace-nowrap rounded-full border border-transparent px-3 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--line)] hover:bg-[var(--surface-2)]"
+                  >
+                    Log out
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       <motion.div
         aria-hidden="true"
-        animate={{ opacity: isMenuOpen ? 1 : 0, scale: isMenuOpen ? 1 : 0.45, x: isMenuOpen ? 0 : -20 }}
+        animate={{
+          height: isOpen ? 112 : 68,
+          opacity: isOpen ? 0 : 0.72,
+          scaleX: isOpen ? 1.7 : 1,
+          width: isOpen ? 58 : 38,
+        }}
         initial={false}
-        transition={spring}
-        className="pointer-events-none absolute left-[244px] top-1/2 size-20 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] shadow-[12px_0_34px_var(--shadow)]"
+        transition={{ duration: isOpen ? 0.82 : 0.54, ease: [0.16, 1, 0.3, 1] }}
+        className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 rounded-l-full bg-[var(--accent-soft)] blur-[10px]"
       />
 
       <motion.button
         type="button"
         aria-controls="primary-navigation-menu"
-        aria-expanded={isMenuOpen}
-        aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-        onMouseEnter={() => setIsMenuOpen(true)}
-        onClick={() => setIsMenuOpen((open) => !open)}
+        aria-expanded={isOpen}
+        aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+        onClick={() => setIsOpen(!isOpen)}
         animate={{
-          borderRadius: isMenuOpen ? 20 : 999,
-          scale: isMenuOpen ? 1.06 : 1,
-          x: isMenuOpen ? 258 : 0,
+          borderRadius: isOpen ? "22px 7px 7px 22px" : "20px 5px 5px 20px",
+          scale: isOpen ? 0.94 : 1,
         }}
         initial={false}
-        transition={spring}
-        className="absolute left-0 top-1/2 z-10 flex h-[88px] w-[52px] -translate-y-1/2 flex-col items-center justify-center gap-2 border border-l-0 border-[var(--line-strong)] bg-[var(--accent)] shadow-[0_18px_55px_var(--shadow)] outline-none transition-colors hover:bg-[var(--accent-2)] focus-visible:ring-2 focus-visible:ring-[var(--text)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-bg)]"
+        transition={{ duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute right-0 top-1/2 z-10 flex h-[74px] w-10 -translate-y-1/2 cursor-pointer items-center justify-center border border-r-0 border-[var(--line-strong)] bg-[var(--accent)] shadow-[0_12px_32px_var(--shadow)] outline-none transition-colors duration-300 hover:bg-[var(--accent-2)] focus-visible:ring-2 focus-visible:ring-[var(--text)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-bg)]"
       >
-        {[0, 1, 2].map((line) => (
+        <span className="relative flex h-full w-full items-center justify-center overflow-hidden">
           <motion.span
-            key={line}
-            animate={{
-              opacity: isMenuOpen && line === 1 ? 0.68 : 1,
-              width: isMenuOpen ? (line === 1 ? 13 : 20) : (line === 1 ? 18 : 23),
-              x: isMenuOpen ? (line === 0 ? 2 : line === 2 ? -2 : 0) : 0,
-            }}
-            transition={spring}
-            className="h-0.5 rounded-full bg-white"
+            aria-hidden="true"
+            animate={{ height: isOpen ? 30 : 7, opacity: isOpen ? 0.28 : 1, y: isOpen ? 0 : -26 }}
+            initial={false}
+            transition={{ duration: 0.88, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute top-1/2 w-[7px] -translate-y-1/2 rounded-full bg-white"
           />
-        ))}
+          <motion.span
+            animate={{ letterSpacing: isOpen ? "0.12em" : "0.22em", opacity: isOpen ? 0.72 : 1 }}
+            initial={false}
+            transition={{ duration: 0.84, ease: [0.16, 1, 0.3, 1] }}
+            className="-rotate-90 text-[10px] font-bold text-white"
+          >
+            MENU
+          </motion.span>
+        </span>
       </motion.button>
-    </motion.aside>
+      </motion.aside>
+    </>
   );
 }
 
@@ -1030,7 +1248,7 @@ function RecoveryQueue({ summary }: { summary: DashboardSummary }) {
     <aside className="min-w-0 rounded-[24px] border border-[var(--line)] bg-[var(--text)] p-5 text-[var(--app-bg)] shadow-[0_24px_70px_var(--shadow)] xl:h-full">
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-normal text-[var(--line-strong)]">Recovery queue</p>
+          <p className="text-sm font-bold uppercase tracking-[0.06em] text-[var(--accent)]">Recovery queue</p>
           <h2 className="mt-2 text-2xl font-semibold text-[var(--surface)]">Live action</h2>
         </div>
         <CircleDot className="text-[var(--accent)]" size={24} />
@@ -1233,35 +1451,100 @@ function Automations({
           </Panel>
         ))}
       </section>
-      <Panel title="Run timeline" description="Completed automation events" icon={ClipboardList}>
-        <div className="space-y-4">
-          {runs.map((run) => (
-            <div key={run.id} className="rounded-[6px] border border-[var(--line)] bg-[var(--surface-2)] p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-semibold">{run.workflow?.name ?? "Automation run"}</p>
-                <Badge value={run.status} />
-              </div>
-              <div className="space-y-2">
-                {run.events.map((event, index) => (
-                  <div key={`${event.name}-${index}`} className="flex gap-2 text-sm">
-                    <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-[var(--accent)]" />
-                    <span className="text-[var(--muted)]">{event.name}</span>
+      <div id="run-timeline" className="scroll-mt-6">
+        <Panel title="Run timeline" description="Completed automation events, newest first" icon={ClipboardList}>
+          <div className="space-y-4">
+            {runs.map((run, runIndex) => {
+              const runMoment = new Date(run.ran_at);
+              const hasValidDate = !Number.isNaN(runMoment.getTime());
+              const runNumber = runs.length - runIndex;
+
+              return (
+                <article key={run.id} className="rounded-[10px] border border-[var(--line)] bg-[var(--surface-2)] p-4">
+                  <div className="mb-4 flex min-w-0 items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-[var(--accent)] px-2.5 py-1 text-xs font-bold tabular-nums text-white">
+                          Run {String(runNumber).padStart(2, "0")}
+                        </span>
+                        {runIndex === 0 && (
+                          <span className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Newest</span>
+                        )}
+                      </div>
+                      <h3 className="truncate text-sm font-semibold">{run.workflow?.name ?? "Automation run"}</h3>
+                    </div>
+                    <Badge value={run.status} />
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
-          {runs.length === 0 && <p className="text-sm text-[var(--muted)]">No runs yet in this browser session.</p>}
-        </div>
-      </Panel>
+
+                  <dl className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {[
+                      ["Date", hasValidDate ? runMoment.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Unavailable"],
+                      ["Time", hasValidDate ? runMoment.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "Unavailable"],
+                      ["Run ID", `#${run.id}`],
+                      ["Events", String(run.events.length)],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-[8px] border border-[var(--line)] bg-[var(--surface)] px-3 py-2">
+                        <dt className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--faint)]">{label}</dt>
+                        <dd className="mt-1 truncate text-xs font-semibold tabular-nums text-[var(--text)]">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+
+                  {run.review && (
+                    <p className="mb-4 rounded-[8px] border border-[var(--line)] bg-[var(--accent-soft)] px-3 py-2 text-xs leading-5 text-[var(--muted)]">
+                      Review: <span className="font-bold text-[var(--text)]">{run.review.customer_name}</span>
+                      {run.review.source ? ` / ${run.review.source}` : ""}
+                      {run.review.location?.name ? ` / ${run.review.location.name}` : ""}
+                    </p>
+                  )}
+
+                  <div className="space-y-2">
+                    {run.events.map((event, eventIndex) => (
+                      <div
+                        key={`${event.name}-${eventIndex}`}
+                        className="grid grid-cols-[24px_minmax(0,1fr)_auto] items-start gap-2 rounded-[8px] border border-[var(--line)] bg-[var(--surface)] p-3"
+                      >
+                        <span className="grid size-6 place-items-center rounded-full bg-[var(--accent-soft)] text-[10px] font-bold tabular-nums text-[var(--accent)]">
+                          {event.step ?? eventIndex + 1}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold">{event.name}</p>
+                          <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{event.detail}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 pt-1 text-xs font-semibold text-[var(--success)]">
+                          <CheckCircle2 size={14} />
+                          <span className="hidden capitalize sm:inline">{event.status ?? "completed"}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              );
+            })}
+            {runs.length === 0 && <p className="text-sm text-[var(--muted)]">No runs yet in this browser session.</p>}
+          </div>
+        </Panel>
+      </div>
     </div>
   );
 }
 
 function Webhooks({ ingestSampleReview, isMutating }: { ingestSampleReview: () => void; isMutating: boolean }) {
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const sample = `curl -X POST http://localhost:8000/api/webhooks/reviews/google \\
   -H "Content-Type: application/json" \\
   -d '{"customer_name":"Priya Shah","rating":1,"title":"No update on refund","body":"I returned my order last week and still have no refund update."}'`;
+
+  const copySample = async () => {
+    try {
+      await navigator.clipboard.writeText(sample);
+      setCopyState("copied");
+    } catch {
+      setCopyState("error");
+    }
+
+    window.setTimeout(() => setCopyState("idle"), 1800);
+  };
 
   return (
     <div className="grid min-w-0 items-start gap-5 xl:grid-cols-2">
@@ -1282,7 +1565,20 @@ function Webhooks({ ingestSampleReview, isMutating }: { ingestSampleReview: () =
             </div>
           ))}
         </div>
-        <pre className="mt-5 max-w-full overflow-x-auto rounded-[6px] border border-[var(--line)] bg-[var(--surface-3)] p-4 text-xs leading-6 text-[var(--text)]">{sample}</pre>
+        <div className="mt-5 max-w-full overflow-hidden rounded-[8px] border border-[var(--line)] bg-[var(--surface-3)]">
+          <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-2.5">
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">cURL request</p>
+            <button
+              type="button"
+              onClick={copySample}
+              className="inline-flex h-8 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-[var(--line-strong)] bg-[var(--surface)] px-3 text-xs font-bold text-[var(--accent)] transition hover:bg-[var(--accent-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            >
+              {copyState === "copied" ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+              {copyState === "copied" ? "Copied" : copyState === "error" ? "Copy failed" : "Copy cURL"}
+            </button>
+          </div>
+          <pre className="max-w-full overflow-x-auto p-4 text-xs leading-6 text-[var(--text)]">{sample}</pre>
+        </div>
       </Panel>
       <Panel title="Live demo action" description="Create, analyse, and route a review" icon={PlugZap}>
         <p className="text-sm leading-6 text-[var(--muted)]">
@@ -1313,14 +1609,22 @@ function Panel({
   title?: string;
 }) {
   return (
-    <section className="h-full min-w-0 overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_24px_70px_var(--shadow)] sm:p-5">
+    <section className="relative h-full min-w-0 overflow-hidden rounded-[24px] border border-[var(--line-strong)] bg-[linear-gradient(145deg,var(--surface)_0%,var(--surface-2)_100%)] p-4 shadow-[0_24px_70px_var(--shadow)] sm:p-5">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--accent),transparent)] opacity-80"
+      />
       {title && (
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
+        <div className="-mx-4 -mt-4 mb-5 flex items-start justify-between gap-4 border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--accent-soft)_42%,var(--surface))] px-4 py-4 sm:-mx-5 sm:-mt-5 sm:px-5">
+          <div className="min-w-0">
             <h2 className="text-lg font-semibold">{title}</h2>
             {description && <p className="mt-1 text-sm text-[var(--muted)]">{description}</p>}
           </div>
-          {Icon && <Icon className="shrink-0 text-[var(--accent)]" size={20} />}
+          {Icon && (
+            <span className="grid size-9 shrink-0 place-items-center rounded-[12px] border border-[var(--line)] bg-[var(--surface)] text-[var(--accent)] shadow-[0_8px_22px_var(--shadow)]">
+              <Icon size={18} />
+            </span>
+          )}
         </div>
       )}
       {children}
@@ -1383,7 +1687,8 @@ function MetricCard({
   value: string | number;
 }) {
   return (
-    <div className="h-full min-w-0 rounded-[22px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_var(--shadow)]">
+    <div className="relative h-full min-w-0 overflow-hidden rounded-[22px] border border-[var(--line)] bg-[linear-gradient(155deg,var(--surface)_0%,var(--surface-2)_100%)] p-5 shadow-[0_18px_50px_var(--shadow)]">
+      <span aria-hidden="true" className="absolute inset-y-5 left-0 w-1 rounded-r-full bg-[var(--accent)] opacity-75" />
       <div className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <span className="min-w-0 pr-2 text-sm font-semibold leading-5 text-[var(--muted)]">{label}</span>
         <div
