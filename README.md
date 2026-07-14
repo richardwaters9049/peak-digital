@@ -1,69 +1,132 @@
 # Peak Digital AI operations platform
 
-This workspace contains **Peak Reviews AI Ops**, a full-stack AI operations console built to demonstrate Laravel depth, practical LLM integration, automation workflows, webhook design, auditability, and end-to-end product delivery.
+[![CI](https://github.com/richardwaters9049/peak-digital/actions/workflows/ci.yml/badge.svg)](https://github.com/richardwaters9049/peak-digital/actions/workflows/ci.yml)
 
-## One-command demo
+This repository contains **Peak Reviews AI Ops**, a full-stack reputation operations console. It combines a Laravel API, Next.js dashboard, PostgreSQL, AI-assisted review analysis, automation workflows, webhook ingestion, and an auditable fallback path.
 
-From this directory, run:
+## Live application
+
+- [Open Peak Reviews AI Ops](https://peak-reviews-ai-ops-web.onrender.com)
+- [Check the Laravel API health endpoint](https://peak-reviews-ai-ops-api.onrender.com/up)
+
+The Render services use the free plan and may take a short time to wake after a period of inactivity.
+
+## Application documentation
+
+The complete architecture, API surface, reliability approach, and production trade-offs are covered in the [Peak Reviews AI Ops application README](projects/peak-reviews-ai-ops/README.md).
+
+Component-specific guides are also available for the [Laravel API](projects/peak-reviews-ai-ops/api/README.md) and [Next.js web application](projects/peak-reviews-ai-ops/web/README.md).
+
+## Run locally with one command
+
+### 1. Clone the repository
+
+Run these commands from the directory where you keep GitHub projects, for example `/Users/your-name/Documents/GitHub`:
 
 ```bash
-scripts/docker_peakDigital
+git clone https://github.com/richardwaters9049/peak-digital.git
+cd peak-digital
 ```
 
-The launcher selects free local ports, generates development-only secrets, builds the Laravel API and Next.js dashboard, starts PostgreSQL, runs migrations and idempotent demo seeding, waits for health checks, and opens the app in your browser where the platform supports it.
+### 2. Start the complete application
 
-The operating system and CPU architecture are detected before startup. The launcher supports macOS (Intel and Apple silicon), Linux, Windows Subsystem for Linux, and Windows through Git Bash. It uses the available Docker Compose interface, selects a compatible port-detection method, provides platform-specific Docker guidance, and opens the dashboard with the native browser command where available.
+Run this command from the repository root, `peak-digital`:
 
-### Platform requirements
+```bash
+bash scripts/docker_peakDigital
+```
+
+The launcher detects the operating system and CPU architecture, selects free local ports, generates development-only secrets, builds every service, starts PostgreSQL, runs migrations and idempotent demo seeding, waits for health checks, and opens the dashboard when the platform supports it.
+
+The terminal prints the selected dashboard and API URLs. No manual dependency installation is required.
+
+## Platform requirements
 
 | Platform | Docker runtime | Shell |
 | --- | --- | --- |
-| macOS | Docker Desktop | Bash included with macOS |
-| Linux | Docker Engine with Compose plugin | Bash |
+| macOS, Intel or Apple silicon | Docker Desktop | Bash included with macOS |
+| Linux | Docker Engine with the Compose plug-in | Bash |
 | Windows with WSL | Docker Desktop with WSL integration | Bash in WSL |
 | Windows | Docker Desktop | Git Bash |
 
-Set `OPEN_BROWSER=0` in headless or remote environments to prevent automatic browser opening.
+Docker must be running before the launcher starts. Set `OPEN_BROWSER=0` in headless or remote environments to prevent automatic browser opening:
 
-No OpenAI key is required. Without one, the app uses its deterministic AI fallback and records that choice in the audit trail. To use OpenAI for the first launch:
+```bash
+OPEN_BROWSER=0 bash scripts/docker_peakDigital
+```
+
+## Application controls
+
+Run every command below from the repository root, `peak-digital`:
+
+```bash
+bash scripts/docker_peakDigital start
+bash scripts/docker_peakDigital stop
+bash scripts/docker_peakDigital restart
+bash scripts/docker_peakDigital status
+bash scripts/docker_peakDigital logs
+bash scripts/docker_peakDigital test
+bash scripts/docker_peakDigital reset
+```
+
+- `start` builds and opens the application while preserving the existing database.
+- `stop` closes the application containers while preserving local data.
+- `restart` stops and then starts the application.
+- `status` shows container health and the selected local URLs.
+- `logs` follows the API and frontend container output.
+- `test` builds the application, runs the Laravel test suite, and runs frontend linting.
+- `reset` removes the local PostgreSQL volume and rebuilds the curated demo dataset.
+
+## Optional OpenAI integration
+
+The application is fully usable without an OpenAI API key. When no key is supplied, it uses deterministic business rules and records the fallback in its AI audit trail.
+
+To use OpenAI for a local launch, run this command from the repository root:
 
 ```bash
 OPENAI_API_KEY=your-key bash scripts/docker_peakDigital
 ```
 
-## Useful controls
+Never commit an API key or generated environment file.
 
-```bash
-scripts/docker_peakDigital start
-scripts/docker_peakDigital stop
-scripts/docker_peakDigital restart
-scripts/docker_peakDigital status
-scripts/docker_peakDigital logs
-scripts/docker_peakDigital test
-scripts/docker_peakDigital reset
+## Current product features
+
+- Executive dashboard with operational metrics, rating distribution, trends, and recovery queue.
+- Review triage, AI analysis, safe reply drafting, and provider/fallback audit details.
+- Automation workflows with numbered, time-stamped run history.
+- Webhook and API laboratory with sample ingestion and copy-to-clipboard support.
+- Responsive fixed sidebar, smooth page controls, system-aware light and dark themes, and Framer Motion transitions.
+- Next.js server-side proxying so internal Docker hostnames are not exposed to the browser.
+
+## Architecture
+
+```text
+Browser
+  └── Next.js 16 web application
+        └── /backend/* proxy
+              └── Laravel 13 API
+                    ├── PostgreSQL 16
+                    └── OpenAI or deterministic fallback
 ```
 
-`stop` closes the application containers while preserving the local database. `start` reopens the existing application, and `restart` performs both operations in sequence.
+Local services run through Docker Compose and bind only to the loopback interface.
 
-`reset` deletes the local demo database volume and rebuilds the curated dataset.
-
-## Workspace layout
+## Repository layout
 
 ```text
 .
-├── scripts/docker_peakDigital
+├── .github/workflows/ci.yml             # GitHub Actions build and test workflow
+├── render.yaml                           # Render web, API, and database blueprint
+├── scripts/docker_peakDigital            # Cross-platform application launcher
 └── projects/peak-reviews-ai-ops
-    ├── api/                 # Laravel API, AI service, webhooks, automations, tests
-    ├── web/                 # Next.js operations dashboard
-    └── docker-compose.yml   # PostgreSQL + API + frontend
+    ├── api/                              # Laravel API, AI services, data, and tests
+    ├── web/                              # Next.js operations dashboard
+    ├── docker-compose.yml                # PostgreSQL, API, and frontend services
+    └── README.md                         # Full application documentation
 ```
 
-## Product demo path
+## CI/CD
 
-1. Start on the executive dashboard and explain the API-backed metrics and topic trends.
-2. Open **Reviews**, choose a low-rating review, and rerun analysis.
-3. Show the reply draft plus the provider/fallback marker in the AI audit trail.
-4. Run **Negative Review Rescue** in the automation lab.
-5. Use **API** to ingest a sample webhook and show the review enter the workflow.
+GitHub Actions runs for pull requests and pushes to `main`. It validates the launcher, builds the Docker services, runs the Laravel tests, runs frontend linting, and cleans up the test containers.
 
-The architecture and talking points are documented in [the project README](projects/peak-reviews-ai-ops/README.md).
+Render is configured through `render.yaml` with `checksPass` deployment gates. A successful `main` build deploys the affected services, which must then pass their configured health checks before the release is marked successful.

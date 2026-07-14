@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Peak Reviews AI Ops web application
 
-## Getting Started
+This directory contains the Next.js 16 and React 19 operations console for Peak Reviews AI Ops. The interface consumes the Laravel API through a server-side Next.js proxy.
 
-First, run the development server:
+## Run the web application
+
+Run the complete stack from the repository root, `/Users/your-name/Documents/GitHub/peak-digital`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bash scripts/docker_peakDigital
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The launcher builds the web application, API, and database, then prints and opens the selected local dashboard URL.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Test the web application
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimise and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Run this command from the repository root:
 
-## Learn More
+```bash
+OPEN_BROWSER=0 bash scripts/docker_peakDigital test
+```
 
-To learn more about Next.js, take a look at the following resources:
+The Docker build performs an optimised Next.js production build and TypeScript validation. The test command then runs ESLint inside the frontend container.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Interface areas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Executive dashboard and recovery queue.
+- Review search, filtering, analysis, and reply drafting.
+- Automation controls and a numbered, time-stamped run timeline.
+- API endpoint reference, copyable `curl` request, and sample webhook ingestion.
+- Fixed responsive sidebar with hover and close interactions.
+- System preference detection for light and dark themes.
+- Smooth page controls and Framer Motion page/component entrances.
 
-## Deploy on Vercel
+## API proxy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Browser requests use `/backend/*`. The catch-all route at `src/app/backend/[...path]/route.ts` forwards them to the URL supplied through `API_URL`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Locally, `API_URL` is `http://api:8000` on the internal Docker network.
+- On Render, `API_URL` points to the public Laravel service.
+
+This arrangement prevents Docker-only service names from reaching browser DNS and keeps environment-specific API routing on the server.
+
+## Main source files
+
+- `src/app/page.tsx` contains the operations workspace, page state, API actions, themes, navigation, and motion components.
+- `src/app/globals.css` contains global styling and browser defaults.
+- `src/app/backend/[...path]/route.ts` contains the Laravel proxy.
+- `next.config.ts` contains Next.js configuration.
+
+## Production deployment
+
+The repository-level `render.yaml` builds this directory as the `peak-reviews-ai-ops-web` Docker service. Render injects the production `API_URL`, waits for GitHub checks to pass, and verifies the `/` health check before marking the deployment successful.
+
+The live interface is available at [peak-reviews-ai-ops-web.onrender.com](https://peak-reviews-ai-ops-web.onrender.com).
+
+See the [application README](../README.md) for the full architecture, or return to the [workspace README](../../../README.md) for installation and launcher commands.
